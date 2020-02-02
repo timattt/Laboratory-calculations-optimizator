@@ -37,14 +37,17 @@ public class GUI {
 		frame.setVisible(true);
 	}
 
+	public static final String extension = "jalco";
+	public static final String ext_dot = "." + extension;
+	
 	public static void createSourceFile() {
-		File src_file = selectFile("Create file for source code", "lc");
+		File src_file = selectFile("Create file for source code", extension);
 
 		if (src_file == null) {
 			return;
 		}
-		if (!src_file.getName().contains(".lc")) {
-			src_file = new File(src_file.getPath() + ".lc");
+		if (!src_file.getName().contains(ext_dot)) {
+			src_file = new File(src_file.getPath() + ext_dot);
 		}
 
 		try {
@@ -59,7 +62,7 @@ public class GUI {
 	}
 
 	public static void openSourceFile() {
-		File src_file = selectFile("Select file with calculator source code", "lc");
+		File src_file = selectFile("Select file with calculator source code", extension);
 
 		if (src_file == null) {
 			return;

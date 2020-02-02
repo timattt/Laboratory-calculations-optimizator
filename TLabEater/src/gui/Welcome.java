@@ -4,6 +4,7 @@
 package gui;
 
 import java.awt.FlowLayout;
+import java.awt.Font;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.event.ActionEvent;
@@ -32,10 +33,10 @@ public class Welcome extends JPanel implements ActionListener {
 	 */
 	public Welcome() {
 		setLayout(new GridBagLayout());
-
+		
 		welcome_text.setBackground(null);
-		//welcome_text.setFont(new Font("Times new Roman", Font.BOLD, 50));
-		welcome_text.setText("Laboratory calculator\nVersion alpha 1.0");
+		welcome_text.setFont(new Font("Times new Roman", Font.BOLD, 20));
+		welcome_text.setText("Just another laboratory calculations optimizator\nVersion alpha 1.0");
 		welcome_text.setEditable(false);
 		welcome_text.setFocusable(false);
 		

@@ -131,7 +131,7 @@ public class Editor extends JPanel implements KeyListener {
 
 	public void setSrcFile(File src) {
 		this.src_file = src;
-		this.comp_file = new File(src.getParent(), src.getName().replace(".lc", "") + ".clc");
+		this.comp_file = new File(src.getParent(), src.getName().replace(GUI.ext_dot, "") + "_compiled" + GUI.ext_dot);
 
 		try {
 			this.src_text_pane.setText(LabLang.readFile(src));
