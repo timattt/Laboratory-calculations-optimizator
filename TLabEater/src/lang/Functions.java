@@ -1,0 +1,379 @@
+/**
+ * 
+ */
+package lang;
+
+import static lang.InfilicityCounter.correctValue;
+import static lang.InfilicityCounter.rountToFirstSignificantDigit;
+import static lang.LabLang.compilationError;
+import static lang.LangStorage.getVariable;
+import static lang.LangStorage.hasVariable;
+import static lang.tree.vertices.ExprVertex.cC;
+import static lang.tree.vertices.ExprVertex.cF;
+import static lang.tree.vertices.ExprVertex.cOp;
+
+import java.awt.BasicStroke;
+import java.awt.Color;
+import java.awt.Font;
+import java.awt.Graphics2D;
+import java.awt.Point;
+import java.awt.RenderingHints;
+import java.awt.image.BufferedImage;
+import java.io.File;
+import java.io.IOException;
+import java.math.BigDecimal;
+import java.math.MathContext;
+import java.util.Arrays;
+import java.util.Comparator;
+
+import javax.imageio.ImageIO;
+
+import bigMath.DefaultBigDecimalMath;
+import lang.LangStorage.Function;
+import lang.LangStorage.Variable;
+import lang.tree.vertices.ExprVertex;
+
+/**
+ * @author timat
+ *
+ */
+public class Functions {
+	// Functions
+	static final Function diff = new Function(2) {
+
+		@Override
+		public BigDecimal invoke(ExprVertex[] args) {
+			LabLang.builder.append("df/d" + args[1].getVariable() + " = ")
+					.append(args[0].dif(args[1].getVariable()).buildString()).append(";");
+			return null;
+		}
+
+		@Override
+		public ExprVertex diff(ExprVertex v, String var) {
+			return null;
+		}
+
+	};
+
+	static final Function makeGraph = new Function(-1) {
+
+		@Override
+		public BigDecimal invoke(ExprVertex[] args) {
+			if (args.length == 0 || (args.length) % 3 != 0) {
+				compilationError("Incorrect number of arguments in makeGraph function");
+			}
+			String img_name = args[args.length - 3].getString();
+			String x_axis_name = args[args.length - 2].getString();
+			String y_axis_name = args[args.length - 1].getString();
+			if (x_axis_name == null) {
+				compilationError("No x axis name for makeGraph function!");
+			}
+			if (y_axis_name == null) {
+				compilationError("No y axis name for makeGraph function!");
+			}
+			if (img_name == null) {
+				compilationError("No image name for makeGraph function!");
+			}
+
+			Variable[] xs = new Variable[(args.length - 3) / 3];
+			Variable[] ys = new Variable[(args.length - 3) / 3];
+			String[] types = new String[xs.length];
+
+			for (int i = 0; i < xs.length; i++) {
+				String x_name = args[3 * i].getVariable();
+				String y_name = args[3 * i + 1].getVariable();
+				String type = args[3 * i + 2].getString();
+				if (x_name == null || y_name == null || type == null || !hasVariable(x_name) || !hasVariable(y_name)) {
+					compilationError("Incorrect argument for makeGraph function");
+				}
+				xs[i] = getVariable(x_name);
+				ys[i] = getVariable(y_name);
+				types[i] = type;
+			}
+
+			try {
+				BufferedImage img = makeGraph(xs, ys, types, x_axis_name, y_axis_name, img_name);
+				if (!img_name.contains(".png")) {
+					img_name += ".png";
+				}
+				ImageIO.write(img, "png", new File(LabLang.homeDirectory, img_name));
+				img.flush();
+			} catch (IOException e) {
+				e.printStackTrace();
+			}
+
+			return null;
+		}
+
+		@Override
+		public ExprVertex diff(ExprVertex v, String var) {
+			return null;
+		}
+
+	};
+
+	static final Function ln = new Function(1) {
+
+		@Override
+		public BigDecimal invoke(ExprVertex[] args) {
+			return DefaultBigDecimalMath.log(args[0].process()[0]);
+		}
+
+		@Override
+		public ExprVertex diff(ExprVertex v, String var) {
+			ExprVertex arg = (ExprVertex) v.getChildren()[0];
+			return cOp('/', arg.dif(var), arg);
+		}
+
+	};
+
+	static final Function sin = new Function(1) {
+
+		@Override
+		public BigDecimal invoke(ExprVertex[] args) {
+			return DefaultBigDecimalMath.sin(args[0].process()[0]);
+		}
+
+		@Override
+		public ExprVertex diff(ExprVertex v, String var) {
+			ExprVertex arg = (ExprVertex) v.getChildren()[0];
+			return cOp('*', cF("cos", arg.copy()), arg.dif(var));
+		}
+
+	};
+
+	static final Function cos = new Function(1) {
+
+		@Override
+		public BigDecimal invoke(ExprVertex[] args) {
+			return DefaultBigDecimalMath.cos(args[0].process()[0]);
+		}
+
+		@Override
+		public ExprVertex diff(ExprVertex v, String var) {
+			ExprVertex arg = (ExprVertex) v.getChildren()[0];
+			return cOp('*', cC(BigDecimal.ONE.negate()), cOp('*', cF("sin", arg.copy()), arg.dif(var)));
+		}
+
+	};
+
+	static final Function leastSquares = new Function(2) {
+
+		@Override
+		public BigDecimal invoke(ExprVertex[] args) {
+			String a_ = args[0].getVariable();
+			String b_ = args[1].getVariable();
+
+			if (a_ == null || b_ == null) {
+				LabLang.compilationError("Incorrect least squares variable names!");
+			}
+
+			BigDecimal[] x = getVariable(a_).values;
+			BigDecimal[] y = getVariable(b_).values;
+
+			int sz = x.length;
+
+			if (sz <= 1) {
+				LabLang.compilationError("Incorrect least squares variable array size!");
+			}
+
+			if (x.length != y.length) {
+				LabLang.compilationError("Incorrect least squares variable sizes!");
+			}
+
+			BigDecimal av_x = BigDecimal.ZERO;
+			for (int i = 0; i < sz; i++) {
+				av_x = av_x.add(x[i]);
+			}
+			av_x = av_x.divide(BigDecimal.valueOf(sz), MathContext.DECIMAL128);
+
+			BigDecimal av_xy = BigDecimal.ZERO;
+			for (int i = 0; i < sz; i++) {
+				av_xy = av_xy.add(x[i].multiply(y[i]));
+			}
+			av_xy = av_xy.divide(BigDecimal.valueOf(sz), MathContext.DECIMAL128);
+
+			BigDecimal av_y = BigDecimal.ZERO;
+			for (int i = 0; i < sz; i++) {
+				av_y = av_y.add(y[i]);
+			}
+			av_y = av_y.divide(BigDecimal.valueOf(sz), MathContext.DECIMAL128);
+
+			BigDecimal av_x2 = BigDecimal.ZERO;
+			for (int i = 0; i < sz; i++) {
+				av_x2 = av_x2.add(x[i].multiply(x[i]));
+			}
+			av_x2 = av_x2.divide(BigDecimal.valueOf(sz), MathContext.DECIMAL128);
+
+			BigDecimal av_y2 = BigDecimal.ZERO;
+			for (int i = 0; i < sz; i++) {
+				av_y2 = av_y2.add(y[i].multiply(y[i]));
+			}
+			av_y2 = av_y2.divide(BigDecimal.valueOf(sz), MathContext.DECIMAL128);
+
+			BigDecimal b = (av_xy.subtract(av_x.multiply(av_y))).divide(av_x2.subtract(av_x.multiply(av_x)),
+					MathContext.DECIMAL128);
+			BigDecimal a = av_y.subtract(b.multiply(av_x));
+
+			BigDecimal db = DefaultBigDecimalMath.pow(av_y2.subtract(av_y.multiply(av_y))
+					.divide(av_x2.subtract(av_x.multiply(av_x)), MathContext.DECIMAL128).subtract(b.multiply(b))
+					.divide(BigDecimal.valueOf(sz), MathContext.DECIMAL128), BigDecimal.valueOf(0.5));
+			BigDecimal da = DefaultBigDecimalMath.pow(av_x2.subtract(av_x.multiply(av_x)), BigDecimal.valueOf(0.5))
+					.multiply(db);
+
+			da = rountToFirstSignificantDigit(da);
+			db = rountToFirstSignificantDigit(db);
+
+			a = correctValue(a, da);
+			b = correctValue(b, db);
+
+			Variable va = getVariable("a");
+			Variable vb = getVariable("b");
+
+			va.setSize(1);
+			vb.setSize(1);
+
+			va.values[0] = a;
+			vb.values[0] = b;
+
+			va.infls[0] = da;
+			vb.infls[0] = db;
+
+			LabLang.builder.append("a = " + a.toPlainString());
+			if (da.compareTo(BigDecimal.ZERO) != 0) {
+				LabLang.builder.append(" # " + da.toPlainString());
+			}
+			LabLang.builder.append(";\n");
+			LabLang.builder.append("b = " + b.toPlainString());
+			if (db.compareTo(BigDecimal.ZERO) != 0) {
+				LabLang.builder.append(" # " + db.toPlainString());
+			}
+			LabLang.builder.append(";\n");
+
+			return null;
+		}
+
+		@Override
+		public ExprVertex diff(ExprVertex v, String var) {
+			return null;
+		}
+
+	};
+
+	private static int width;
+	private static int height;
+
+	private static int x(double xd) {
+		return (int) (width * xd);
+	}
+
+	private static int y(double yd) {
+		return (int) (height * yd);
+	}
+
+	private static BufferedImage makeGraph(Variable[] xs, Variable[] ys, String[] types, String xname, String yname,
+			String img_name) {
+		width = 1000;
+		height = 1000;
+
+		BufferedImage gr = new BufferedImage(width, height, BufferedImage.TYPE_BYTE_INDEXED);
+		Graphics2D g = gr.createGraphics();
+		RenderingHints rh = new RenderingHints(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
+		g.setRenderingHints(rh);
+		g.setFont(new Font("Times new roman", Font.ITALIC, 25));
+
+		BigDecimal minx = xs[0].values[0];
+		BigDecimal maxx = xs[0].values[0];
+		BigDecimal miny = ys[0].values[0];
+		BigDecimal maxy = ys[0].values[0];
+
+		for (Variable v : xs) {
+			for (BigDecimal n : v.values) {
+				minx = minx.min(n);
+				maxx = maxx.max(n);
+			}
+		}
+		for (Variable v : ys) {
+			for (BigDecimal n : v.values) {
+				miny = miny.min(n);
+				maxy = maxy.max(n);
+			}
+		}
+
+		g.setStroke(new BasicStroke(3));
+
+		// Axis
+		g.setColor(Color.WHITE);
+		g.fillRect(0, 0, width, height);
+		g.setColor(Color.BLACK);
+		g.drawLine(0, y(0.95), x(1), y(0.95));
+		g.drawLine(x(0.05), 0, x(0.05), y(1));
+
+		// a
+		g.drawLine(x(1), y(0.95), x(0.97), y(0.94));
+		g.drawLine(x(1), y(0.95), x(0.97), y(0.96));
+		g.drawString(xname, x(0.97), y(0.98));
+
+		// b
+		g.drawLine(x(0.04), y(0.03), x(0.05), y(0));
+		g.drawLine(x(0.06), y(0.03), x(0.05), y(0));
+		g.drawString(yname, x(0.0645), y(0.03));
+
+		for (int i = 0; i < xs.length; i++) {
+			Variable xs_ = xs[i];
+			Variable ys_ = ys[i];
+
+			boolean isline = (types[i].contains("line"));
+			boolean ispoints = types[i].contains("points");
+
+			Point[] points = new Point[xs_.values.length];
+
+			for (int j = 0; j < xs_.values.length; j++) {
+				BigDecimal x = xs_.values[j];
+				BigDecimal y = ys_.values[j];
+
+				int xc = x(x.subtract(minx).divide(maxx.subtract(minx), MathContext.DECIMAL128)
+						.multiply(BigDecimal.valueOf(0.8)).add(BigDecimal.valueOf(0.1)).doubleValue());
+				int yc = y(1 - y.subtract(miny).divide(maxy.subtract(miny), MathContext.DECIMAL128)
+						.multiply(BigDecimal.valueOf(0.8)).add(BigDecimal.valueOf(0.1)).doubleValue());
+
+				points[j] = new Point(xc, yc);
+
+				g.setColor(Color.BLACK);
+
+				g.drawLine(xc, y(0.94), xc, y(0.96));
+				g.drawString(x.toPlainString(), xc + x(0.005), y(0.973));
+
+				g.drawLine(x(0.04), yc, x(0.06), yc);
+				g.drawString(y.toPlainString(), x(0.053), yc - y(0.005));
+			}
+
+			Arrays.sort(points, new Comparator<Point>() {
+
+				@Override
+				public int compare(Point o1, Point o2) {
+					if (o1.x == o2.x) {
+						return o1.y - o2.y;
+					}
+					return o1.x - o2.x;
+				}
+			});
+			if (isline)
+				for (int j = 0; j < xs_.values.length - 1; j++) {
+					g.setColor(Color.darkGray);
+					g.drawLine(points[j].x, points[j].y, points[j + 1].x, points[j + 1].y);
+				}
+			if (ispoints)
+				for (Point p : points) {
+					int xc = p.x;
+					int yc = p.y;
+					g.setColor(Color.RED);
+					g.drawOval(xc - x(0.005), yc - x(0.005), x(0.01), x(0.01));
+
+				}
+
+		}
+
+		return gr;
+	}
+}
