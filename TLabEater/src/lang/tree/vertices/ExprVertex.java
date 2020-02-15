@@ -205,13 +205,13 @@ public class ExprVertex extends LVertex {
 			}
 			// !
 
-			if ((operator == '^' || operator == '*' || operator == '/') && hasOperatorsIn(l(), '+', '-')) {
+			if ((operator == '^' || operator == '*' || operator == '/') && hasOperatorsIn(l(), '+', '-', '/', '*')) {
 				res += "(" + l().buildString() + ")";
 			} else {
 				res += l().buildString();
 			}
 			res += " " + operator + " ";
-			if ((operator == '^' || operator == '*' || operator == '/') && hasOperatorsIn(r(), '+', '-')) {
+			if ((operator == '^' || operator == '*' || operator == '/') && hasOperatorsIn(r(), '+', '-', '/', '*')) {
 				res += "(" + r().buildString() + ")";
 			} else {
 				res += r().buildString();

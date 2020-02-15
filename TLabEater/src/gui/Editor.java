@@ -81,7 +81,7 @@ public class Editor extends JPanel implements KeyListener {
 
 		con.gridy = 4;
 		con.gridx = 3;
-		con.weightx = 0;
+		con.weightx = 0.5;
 		con.weighty = 0;
 		con.fill = GridBagConstraints.HORIZONTAL;
 
@@ -100,7 +100,7 @@ public class Editor extends JPanel implements KeyListener {
 		p.add(autoCompile, BorderLayout.SOUTH);
 		con.gridy = 3;
 		con.gridx = 0;
-		con.weightx = 0;
+		con.weightx = 0.5;
 		con.weighty = 0;
 		add(p, con);
 

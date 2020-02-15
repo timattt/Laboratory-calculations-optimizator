@@ -92,7 +92,7 @@ public class Functions {
 			}
 
 			try {
-				BufferedImage img = makeGraph(xs, ys, types, x_axis_name, y_axis_name, img_name);
+				BufferedImage img = makeGraph(xs, ys, types, x_axis_name, y_axis_name, img_name, 5);
 				if (!img_name.contains(".png")) {
 					img_name += ".png";
 				}
@@ -272,7 +272,7 @@ public class Functions {
 	}
 
 	private static BufferedImage makeGraph(Variable[] xs, Variable[] ys, String[] types, String xname, String yname,
-			String img_name) {
+			String img_name, int total_divs) {
 		width = 1000;
 		height = 1000;
 
@@ -302,12 +302,89 @@ public class Functions {
 
 		g.setStroke(new BasicStroke(3));
 
-		// Axis
+		BigDecimal dx = InfilicityCounter.rountToFirstSignificantDigit(
+				maxx.subtract(minx).divide(BigDecimal.valueOf(total_divs), MathContext.DECIMAL128));
+		BigDecimal dy = InfilicityCounter.rountToFirstSignificantDigit(
+				maxy.subtract(miny).divide(BigDecimal.valueOf(total_divs), MathContext.DECIMAL128));
+
+		for (int i = 0;; i++) {
+			if ((BigDecimal.valueOf(i + 1).multiply(dx)).compareTo(minx) == 1) {
+				minx = BigDecimal.valueOf(i).multiply(dx);
+				break;
+			}
+		}
+		for (int i = 0;; i++) {
+			if ((BigDecimal.valueOf(i + 1).multiply(dy)).compareTo(miny) == 1) {
+				miny = BigDecimal.valueOf(i).multiply(dy);
+				break;
+			}
+		}
+		for (int i = 0;; i++) {
+			BigDecimal v = null;
+			if ((v = BigDecimal.valueOf(i).multiply(dx)).compareTo(maxx) == 1) {
+				maxx = v;
+				break;
+			}
+		}
+		for (int i = 0;; i++) {
+			BigDecimal v = null;
+			if ((v = BigDecimal.valueOf(i).multiply(dy)).compareTo(maxy) == 1) {
+				maxy = v;
+				break;
+			}
+		}
+
+		// Clear
 		g.setColor(Color.WHITE);
 		g.fillRect(0, 0, width, height);
+		g.setColor(Color.black);
+
+		// Marks on axis
+		BigDecimal v = dx;
+		for (int j = 1;; j++) {
+			v = dx.multiply(BigDecimal.valueOf(j));
+			if (v.compareTo(minx) == 0 || v.compareTo(minx) == 1) {
+
+				int xc = x(v.subtract(minx).divide(maxx.subtract(minx), MathContext.DECIMAL128)
+						.multiply(BigDecimal.valueOf(0.8)).add(BigDecimal.valueOf(0.1)).doubleValue());
+				g.drawLine(xc, y(0.94), xc, y(0.96));
+				g.drawString(v.stripTrailingZeros().toPlainString(), xc + x(0.005), y(0.973));
+
+				g.setColor(Color.LIGHT_GRAY);
+
+				g.drawLine(xc, y(0.95), xc, y(0));
+
+				g.setColor(Color.black);
+			}
+			if (maxx.compareTo(v) == -1) {
+				break;
+			}
+		}
+
+		for (int j = 1;; j++) {
+			v = dy.multiply(BigDecimal.valueOf(j));
+			if (v.compareTo(miny) == 0 || v.compareTo(miny) == 1) {
+				int yc = y(1 - v.subtract(miny).divide(maxy.subtract(miny), MathContext.DECIMAL128)
+						.multiply(BigDecimal.valueOf(0.8)).add(BigDecimal.valueOf(0.1)).doubleValue());
+
+				g.drawLine(x(0.04), yc, x(0.06), yc);
+				g.drawString(v.stripTrailingZeros().toPlainString(), x(0.053), yc - y(0.005));
+
+				g.setColor(Color.LIGHT_GRAY);
+
+				g.drawLine(x(0.05), yc, x(1), yc);
+
+				g.setColor(Color.black);
+			}
+			if (maxy.compareTo(v) == -1) {
+				break;
+			}
+		}
+
+		// Axis
 		g.setColor(Color.BLACK);
-		g.drawLine(0, y(0.95), x(1), y(0.95));
-		g.drawLine(x(0.05), 0, x(0.05), y(1));
+		g.drawLine(x(0.1), y(0.95), x(1), y(0.95));
+		g.drawLine(x(0.05), y(0), x(0.05), y(0.9));
 
 		// a
 		g.drawLine(x(1), y(0.95), x(0.97), y(0.94));
@@ -325,8 +402,12 @@ public class Functions {
 
 			boolean isline = (types[i].contains("line"));
 			boolean ispoints = types[i].contains("points");
+			boolean drawInfl = (types[i].contains("infl") || types[i].contains("inflilicity")
+					|| types[i].contains("inflilicities"));
 
 			Point[] points = new Point[xs_.values.length];
+			int[] infls_x = new int[xs_.values.length];
+			int[] infls_y = new int[xs_.values.length];
 
 			for (int j = 0; j < xs_.values.length; j++) {
 				BigDecimal x = xs_.values[j];
@@ -337,19 +418,17 @@ public class Functions {
 				int yc = y(1 - y.subtract(miny).divide(maxy.subtract(miny), MathContext.DECIMAL128)
 						.multiply(BigDecimal.valueOf(0.8)).add(BigDecimal.valueOf(0.1)).doubleValue());
 
+				int infl_y = y(ys_.infls[j].divide(maxy.subtract(miny), MathContext.DECIMAL128)
+						.multiply(BigDecimal.valueOf(0.8)).doubleValue());
+				int infl_x = x(xs_.infls[j].divide(maxx.subtract(minx), MathContext.DECIMAL128)
+						.multiply(BigDecimal.valueOf(0.8)).doubleValue());
+
 				points[j] = new Point(xc, yc);
-
-				g.setColor(Color.BLACK);
-
-				g.drawLine(xc, y(0.94), xc, y(0.96));
-				g.drawString(x.toPlainString(), xc + x(0.005), y(0.973));
-
-				g.drawLine(x(0.04), yc, x(0.06), yc);
-				g.drawString(y.toPlainString(), x(0.053), yc - y(0.005));
+				infls_y[j] = infl_y;
+				infls_x[j] = infl_x;
 			}
 
 			Arrays.sort(points, new Comparator<Point>() {
-
 				@Override
 				public int compare(Point o1, Point o2) {
 					if (o1.x == o2.x) {
@@ -358,6 +437,25 @@ public class Functions {
 					return o1.x - o2.x;
 				}
 			});
+
+			if (drawInfl) {
+				g.setColor(Color.BLUE);
+				for (int j = 0; j < xs_.values.length; j++) {
+					// Y
+					g.drawLine(points[j].x, points[j].y - infls_y[j], points[j].x, points[j].y + infls_y[j]);
+					g.drawLine(points[j].x - x(0.001), points[j].y - infls_y[j], points[j].x + x(0.001),
+							points[j].y - infls_y[j]);
+					g.drawLine(points[j].x - x(0.001), points[j].y + infls_y[j], points[j].x + x(0.001),
+							points[j].y + infls_y[j]);
+
+					// X
+					g.drawLine(points[j].x - infls_x[j], points[j].y, points[j].x + infls_x[j], points[j].y);
+					g.drawLine(points[j].x - infls_x[j], points[j].y - y(0.001), points[j].x - infls_x[j],
+							points[j].y + y(0.001));
+					g.drawLine(points[j].x + infls_x[j], points[j].y - y(0.001), points[j].x + infls_x[j],
+							points[j].y + y(0.001));
+				}
+			}
 			if (isline)
 				for (int j = 0; j < xs_.values.length - 1; j++) {
 					g.setColor(Color.darkGray);

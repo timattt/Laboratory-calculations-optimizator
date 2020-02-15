@@ -41,6 +41,7 @@ public class InfilicityCounter {
 
 		//System.out.println(result.toPlainString());
 		result = DefaultBigDecimalMath.pow(result, BigDecimal.valueOf(0.5));
+		//return result;
 		return rountToFirstSignificantDigit(result).stripTrailingZeros();
 	}
 
@@ -61,7 +62,7 @@ public class InfilicityCounter {
 		infl = infl.add(BigDecimal.valueOf(0.0));
 		BigDecimal mul = BigDecimal.TEN.pow(infl.toPlainString().length() - 2);
 
-		if (infl.compareTo(BigDecimal.ONE) == 1) {
+		if (infl.compareTo(BigDecimal.ONE) == 1 || infl.compareTo(BigDecimal.ONE) == 0) {
 			mul = BigDecimal.ONE.divide(mul).multiply(BigDecimal.TEN);
 		}
 

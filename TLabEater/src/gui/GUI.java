@@ -37,7 +37,7 @@ public class GUI {
 		frame.setVisible(true);
 	}
 
-	public static final String extension = "jalco";
+	public static final String extension = "lco";
 	public static final String ext_dot = "." + extension;
 	
 	public static void createSourceFile() {

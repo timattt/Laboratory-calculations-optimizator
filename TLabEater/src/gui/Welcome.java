@@ -36,7 +36,7 @@ public class Welcome extends JPanel implements ActionListener {
 		
 		welcome_text.setBackground(null);
 		welcome_text.setFont(new Font("Times new Roman", Font.BOLD, 20));
-		welcome_text.setText("Just another laboratory calculations optimizator\nVersion alpha 1.0");
+		welcome_text.setText("Laboratory calculations optimizator\nVersion alpha 1.1");
 		welcome_text.setEditable(false);
 		welcome_text.setFocusable(false);
 		
