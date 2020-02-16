@@ -241,7 +241,7 @@ public class GrammarTreeCreator {
 		climbDown("T");
 
 		P();
-		if (tryOperators('*', '/', '^')) {
+		if (tryOperators('^', '*', '/')) {
 			T();
 		}
 

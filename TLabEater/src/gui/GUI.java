@@ -35,6 +35,8 @@ public class GUI {
 		initMenu();
 
 		frame.setVisible(true);
+		
+		refresh();
 	}
 
 	public static final String extension = "lco";
@@ -59,6 +61,7 @@ public class GUI {
 		editor.setSrcFile(src_file);
 
 		frame.setContentPane(editor);
+		refresh();
 	}
 
 	public static void openSourceFile() {
@@ -75,11 +78,13 @@ public class GUI {
 		editor.setSrcFile(src_file);
 
 		frame.setContentPane(editor);
+		refresh();
 	}
 
 	public static void returnToMenu() {
 		frame.setContentPane(welcome);
 		editor.flushFiles();
+		refresh();
 	}
 
 	public static void saveSourceFile() {
@@ -121,6 +126,7 @@ public class GUI {
 
 	public static void refresh() {
 		SwingUtilities.updateComponentTreeUI(frame);
+		welcome.resetBackground();
 	}
 
 	public static JFrame getFrame() {

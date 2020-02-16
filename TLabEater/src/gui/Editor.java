@@ -20,6 +20,7 @@ import javax.swing.JEditorPane;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JTextField;
+import javax.swing.JTextPane;
 
 import lang.LabLang;
 
@@ -33,7 +34,7 @@ public class Editor extends JPanel implements KeyListener {
 	// Writing areas
 	private JEditorPane src_text_pane;
 	private JEditorPane comp_text_pane;
-	private JEditorPane info_text_pane;
+	private JTextPane info_text_pane;
 
 	// Font
 	private final Font font = new Font("Times new roman", Font.PLAIN, 20);
@@ -54,33 +55,31 @@ public class Editor extends JPanel implements KeyListener {
 		con.insets.bottom = con.insets.top = 3;
 		con.insets.left = con.insets.right = 20;
 		con.fill = GridBagConstraints.HORIZONTAL;
-
+		con.ipadx = 10;
 		JTextField tp = new JTextField("Source code:");
 		tp.setEditable(false);
 		tp.setFocusable(false);
 		tp.setBackground(null);
-		add(tp, con);
+		add(tp, con);//!!!!!!!!!!!
 
 		tp = new JTextField("Compiled code:");
 		tp.setEditable(false);
 		tp.setFocusable(false);
 		tp.setBackground(null);
-		con.gridx = 3;
-		add(tp, con);
+		con.gridx = 1;
+		add(tp, con);//!!!!!!!!!!!
 
-		// con.insets.bottom = con.insets.top = con.insets.left = con.insets.right = 0;
 		con.fill = GridBagConstraints.BOTH;
 		con.weightx = 0.5;
 		con.weighty = 1;
 		con.gridy = 1;
 		con.gridx = 0;
-		add(new JScrollPane(src_text_pane = new JEditorPane()), con);
+		add(new JScrollPane(src_text_pane = new JEditorPane()), con);//!!!!!!!!!!!
 
-		con.gridx = 3;
-		add(new JScrollPane(comp_text_pane = new JEditorPane()), con);
+		con.gridx = 1;
+		add(new JScrollPane(comp_text_pane = new JEditorPane()), con);//!!!!!!!!!!!
 
-		con.gridy = 4;
-		con.gridx = 3;
+		con.gridy = 2;
 		con.weightx = 0.5;
 		con.weighty = 0;
 		con.fill = GridBagConstraints.HORIZONTAL;
@@ -98,26 +97,25 @@ public class Editor extends JPanel implements KeyListener {
 		});
 		p.add(compile, BorderLayout.NORTH);
 		p.add(autoCompile, BorderLayout.SOUTH);
-		con.gridy = 3;
 		con.gridx = 0;
 		con.weightx = 0.5;
 		con.weighty = 0;
-		add(p, con);
+		add(p, con);//!!!!!!!!!!!
 
 		// INFO
 		p = new JPanel();
 		p.setLayout(new BorderLayout());
 
-		p.add(info_text_pane = new JEditorPane(), BorderLayout.SOUTH);
+		p.add(info_text_pane = new JTextPane(), BorderLayout.SOUTH);
 		tp = new JTextField("Compilation status:");
 		tp.setEditable(false);
 		tp.setFocusable(false);
 		tp.setBackground(null);
 		p.add(tp, BorderLayout.NORTH);
 
-		con.gridx = 3;
-		con.gridy = 3;
-		add(p, con);
+		con.gridx = 1;
+		con.weightx = 0.5;
+		add(p, con);//!!!!!!!!!!!
 
 		comp_text_pane.setEditable(false);
 		src_text_pane.addKeyListener(this);
@@ -127,6 +125,8 @@ public class Editor extends JPanel implements KeyListener {
 		src_text_pane.setFont(font);
 		comp_text_pane.setFont(font);
 		info_text_pane.setFont(font);
+		
+		info_text_pane.setText("No exception...");
 	}
 
 	public void setSrcFile(File src) {
