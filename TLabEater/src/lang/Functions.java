@@ -18,6 +18,8 @@ import java.awt.Font;
 import java.awt.Graphics2D;
 import java.awt.Point;
 import java.awt.RenderingHints;
+import java.awt.font.FontRenderContext;
+import java.awt.geom.AffineTransform;
 import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.IOException;
@@ -25,6 +27,8 @@ import java.math.BigDecimal;
 import java.math.MathContext;
 import java.util.Arrays;
 import java.util.Comparator;
+import java.util.LinkedList;
+import java.util.Scanner;
 
 import javax.imageio.ImageIO;
 
@@ -38,7 +42,98 @@ import lang.tree.vertices.ExprVertex;
  *
  */
 public class Functions {
+	
 	// Functions
+	static final Function loadCsv = new Function(1) {
+
+		@Override
+		public BigDecimal invoke(ExprVertex[] args) {
+			ExprVertex arg = args[0];
+			if (arg.getString() == null) {
+				LabLang.compilationError("Function loadCsv may have string as parameter!");
+			}
+			File file = new File(arg.getString());
+			try {
+				Scanner sc = new Scanner(file);
+				final String splt = "[/t/n ,]";
+				String names_str = sc.nextLine();
+				String[] divs = names_str.split(splt);
+				String[] names = new String[divs.length];
+
+				Variable[] vars = new Variable[divs.length];
+				for (int i = 0; i < vars.length; i++) {
+					vars[i] = LangStorage.getVariable(names[i] = divs[i]);
+				}
+
+				LinkedList<String> lines = new LinkedList<String>();
+				while (sc.hasNextLine()) {
+					lines.add(sc.nextLine());
+				}
+
+				for (int i = 0; i < vars.length; i++) {
+					vars[i].setSize(lines.size());
+				}
+
+				for (int j = 0; !lines.isEmpty(); j++) {
+					String line = lines.removeFirst();
+					divs = line.split(splt);
+
+					for (int i = 0; i < vars.length; i++) {
+						vars[i].values[j] = BigDecimal.valueOf(Double.parseDouble(divs[i]));
+						vars[i].infls[j] = BigDecimal.ZERO;
+					}
+				}
+
+				for (int i = 0; i < vars.length; i++) {
+					Variable v = vars[i];
+					LabLang.writeVariable(names[i], v);
+				}
+
+				sc.close();
+			} catch (Exception e) {
+				e.printStackTrace();
+				LabLang.compilationError("Function loadCsv can not read file!");
+			}
+
+			return null;
+		}
+
+		@Override
+		public ExprVertex diff(ExprVertex v, String var) {
+			return null;
+		}
+	};
+
+	static final Function useExp = new Function(0) {
+
+		@Override
+		public BigDecimal invoke(ExprVertex[] args) {
+			LangStorage.printExponent = true;
+			return null;
+		}
+
+		@Override
+		public ExprVertex diff(ExprVertex v, String var) {
+			return null;
+		}
+
+	};
+
+	static final Function disableExp = new Function(0) {
+
+		@Override
+		public BigDecimal invoke(ExprVertex[] args) {
+			LangStorage.printExponent = false;
+			return null;
+		}
+
+		@Override
+		public ExprVertex diff(ExprVertex v, String var) {
+			return null;
+		}
+
+	};
+
 	static final Function diff = new Function(2) {
 
 		@Override
@@ -239,16 +334,8 @@ public class Functions {
 			va.infls[0] = da;
 			vb.infls[0] = db;
 
-			LabLang.builder.append("a = " + a.toPlainString());
-			if (da.compareTo(BigDecimal.ZERO) != 0) {
-				LabLang.builder.append(" # " + da.toPlainString());
-			}
-			LabLang.builder.append(";\n");
-			LabLang.builder.append("b = " + b.toPlainString());
-			if (db.compareTo(BigDecimal.ZERO) != 0) {
-				LabLang.builder.append(" # " + db.toPlainString());
-			}
-			LabLang.builder.append(";\n");
+			LabLang.writeVariable("a", va);
+			LabLang.writeVariable("b", vb);
 
 			return null;
 		}
@@ -273,14 +360,12 @@ public class Functions {
 
 	private static BufferedImage makeGraph(Variable[] xs, Variable[] ys, String[] types, String xname, String yname,
 			String img_name, int total_divs) {
+		Font fnt = new Font("Times new roman", Font.ITALIC, 25);
+		AffineTransform affinetransform = new AffineTransform();
+		FontRenderContext frc = new FontRenderContext(affinetransform, true, true);
+
 		width = 1000;
 		height = 1000;
-
-		BufferedImage gr = new BufferedImage(width, height, BufferedImage.TYPE_BYTE_INDEXED);
-		Graphics2D g = gr.createGraphics();
-		RenderingHints rh = new RenderingHints(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
-		g.setRenderingHints(rh);
-		g.setFont(new Font("Times new roman", Font.ITALIC, 25));
 
 		BigDecimal minx = xs[0].values[0];
 		BigDecimal maxx = xs[0].values[0];
@@ -300,33 +385,39 @@ public class Functions {
 			}
 		}
 
-		g.setStroke(new BasicStroke(3));
+		// ERRORS!!!
+		if (minx.compareTo(BigDecimal.ZERO) == -1 || minx.compareTo(BigDecimal.ZERO) == 0) {
+			// LabLang.compilationError("Graph values lower or equals to zero!");
+		}
+		if (miny.compareTo(BigDecimal.ZERO) == -1 || miny.compareTo(BigDecimal.ZERO) == 0) {
+			// LabLang.compilationError("Graph values lower or equals to zero!");
+		}
 
 		BigDecimal dx = InfilicityCounter.rountToFirstSignificantDigit(
 				maxx.subtract(minx).divide(BigDecimal.valueOf(total_divs), MathContext.DECIMAL128));
 		BigDecimal dy = InfilicityCounter.rountToFirstSignificantDigit(
 				maxy.subtract(miny).divide(BigDecimal.valueOf(total_divs), MathContext.DECIMAL128));
 
-		for (int i = 0;; i++) {
+		for (int i = -1000;; i++) {
 			if ((BigDecimal.valueOf(i + 1).multiply(dx)).compareTo(minx) == 1) {
 				minx = BigDecimal.valueOf(i).multiply(dx);
 				break;
 			}
 		}
-		for (int i = 0;; i++) {
+		for (int i = -1000;; i++) {
 			if ((BigDecimal.valueOf(i + 1).multiply(dy)).compareTo(miny) == 1) {
 				miny = BigDecimal.valueOf(i).multiply(dy);
 				break;
 			}
 		}
-		for (int i = 0;; i++) {
+		for (int i = -1000;; i++) {
 			BigDecimal v = null;
 			if ((v = BigDecimal.valueOf(i).multiply(dx)).compareTo(maxx) == 1) {
 				maxx = v;
 				break;
 			}
 		}
-		for (int i = 0;; i++) {
+		for (int i = -1000;; i++) {
 			BigDecimal v = null;
 			if ((v = BigDecimal.valueOf(i).multiply(dy)).compareTo(maxy) == 1) {
 				maxy = v;
@@ -334,14 +425,23 @@ public class Functions {
 			}
 		}
 
+		// Create image
+		BufferedImage gr = new BufferedImage((int) (width + fnt.getStringBounds(xname, frc).getWidth()), height,
+				BufferedImage.TYPE_BYTE_INDEXED);
+		Graphics2D g = gr.createGraphics();
+		RenderingHints rh = new RenderingHints(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
+		g.setRenderingHints(rh);
+		g.setFont(fnt);
+		g.setStroke(new BasicStroke(3));
+
 		// Clear
 		g.setColor(Color.WHITE);
-		g.fillRect(0, 0, width, height);
+		g.fillRect(0, 0, gr.getWidth(), gr.getHeight());
 		g.setColor(Color.black);
 
 		// Marks on axis
 		BigDecimal v = dx;
-		for (int j = 1;; j++) {
+		for (int j = -1000;; j++) {
 			v = dx.multiply(BigDecimal.valueOf(j));
 			if (v.compareTo(minx) == 0 || v.compareTo(minx) == 1) {
 
@@ -356,17 +456,19 @@ public class Functions {
 
 				g.setColor(Color.black);
 			}
+			v = dx.multiply(BigDecimal.valueOf(j + 1));
 			if (maxx.compareTo(v) == -1) {
 				break;
 			}
 		}
 
-		for (int j = 1;; j++) {
+		for (int j = -1000;; j++) {
 			v = dy.multiply(BigDecimal.valueOf(j));
 			if (v.compareTo(miny) == 0 || v.compareTo(miny) == 1) {
 				int yc = y(1 - v.subtract(miny).divide(maxy.subtract(miny), MathContext.DECIMAL128)
 						.multiply(BigDecimal.valueOf(0.8)).add(BigDecimal.valueOf(0.1)).doubleValue());
 
+				g.setColor(Color.black);
 				g.drawLine(x(0.04), yc, x(0.06), yc);
 				g.drawString(v.stripTrailingZeros().toPlainString(), x(0.053), yc - y(0.005));
 
@@ -376,6 +478,7 @@ public class Functions {
 
 				g.setColor(Color.black);
 			}
+			v = dy.multiply(BigDecimal.valueOf(j + 1));
 			if (maxy.compareTo(v) == -1) {
 				break;
 			}

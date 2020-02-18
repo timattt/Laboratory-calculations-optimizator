@@ -44,6 +44,10 @@ public class Tokenizer {
 
 		return false;
 	}
+	
+	private static boolean isNumber(char s) {
+		return s >= '0' && s <= '9';
+	}
 
 	/**
 	 * Splits string by delimiters into tokens array.
@@ -120,7 +124,12 @@ public class Tokenizer {
 			}
 
 			boolean isOperator = isOperator(s);
-
+			
+			// CHECKING something like 10E-2
+			if (s == '-' && i > 0 && (text.charAt(i - 1) == 'E' || text.charAt(i - 1) == 'e') && isNumber(text.charAt(start + 1))) {
+				isOperator = false;
+			}
+			
 			if (isDividor(text.charAt(i)) || isOperator) {
 				int end = i;
 
@@ -133,6 +142,10 @@ public class Tokenizer {
 						type = TokenType.number;
 					} catch (Exception e) {
 						type = TokenType.name;
+						
+						if (isNumber(value.charAt(0))) {
+							LabLang.syntaxError("Name may not starts with number!", line_num);
+						} 
 					}
 
 					raw.add(new Token(type, value, line_num));

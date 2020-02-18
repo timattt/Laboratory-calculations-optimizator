@@ -39,9 +39,9 @@ public class InfilicityCounter {
 			result = result.add(a.multiply(a));
 		}
 
-		//System.out.println(result.toPlainString());
+		// System.out.println(result.toPlainString());
 		result = DefaultBigDecimalMath.pow(result, BigDecimal.valueOf(0.5));
-		//return result;
+		// return result;
 		return rountToFirstSignificantDigit(result).stripTrailingZeros();
 	}
 
@@ -80,32 +80,7 @@ public class InfilicityCounter {
 	 * @return - rounded number.
 	 */
 	public static BigDecimal rountToFirstSignificantDigit(BigDecimal v) {
-		v = v.add(BigDecimal.valueOf(0.0));
-		String str = v.toPlainString();
-		if (v.compareTo(BigDecimal.ZERO) == 0) {
-			return v;
-		}
-		if (v.abs().compareTo(BigDecimal.ONE) == -1) {
-			for (int i = 0; i < str.length(); i++) {
-				char s = str.charAt(i);
-				if (s != '-' && s != '0' && s != '.') {
-					str = str.substring(0, i + 1);
-					return new BigDecimal(str);
-				}
-			}
-		} else {
-			char[] arr = str.toCharArray();
-			for (int i = 1; i < arr.length; i++) {
-				char s = arr[i];
-				if (s == '.') {
-					return new BigDecimal(new String(arr).substring(0, i));
-				} else {
-					arr[i] = '0';
-				}
-			}
-		}
-
-		return v;
+		return v.round(new MathContext(1));
 	}
 
 }

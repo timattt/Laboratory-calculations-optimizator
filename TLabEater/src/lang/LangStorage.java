@@ -9,6 +9,9 @@ import static lang.Functions.makeGraph;
 import static lang.Functions.sin;
 import static lang.Functions.ln;
 import static lang.Functions.diff;
+import static lang.Functions.useExp;
+import static lang.Functions.disableExp;
+import static lang.Functions.loadCsv;
 
 import java.math.BigDecimal;
 import java.util.TreeMap;
@@ -28,6 +31,7 @@ public class LangStorage {
 	 * return 2.
 	 */
 	public static int calcIndex = 0;
+	public static boolean printExponent = false;
 
 	private static final TreeMap<String, Variable> vars = new TreeMap<String, Variable>();
 
@@ -46,6 +50,9 @@ public class LangStorage {
 		funcs.put("makeGraph", makeGraph);
 		funcs.put("ln", ln);
 		funcs.put("diff", diff);
+		funcs.put("useExp", useExp);
+		funcs.put("disableExp", disableExp);
+		funcs.put("loadCsv", loadCsv);
 	}
 
 	/**
@@ -153,5 +160,12 @@ public class LangStorage {
 		public abstract BigDecimal invoke(ExprVertex[] args);
 
 		public abstract ExprVertex diff(ExprVertex v, String var);
+	}
+
+	/**
+	 * Invokes when new compilation begins.
+	 */
+	public static void preInit() {
+		printExponent = false;
 	}
 }

@@ -40,7 +40,7 @@ public class AssignVertex extends LVertex {
 	@Override
 	public BigDecimal[] process() {
 		// Process assign and calculates infelicity
-		
+
 		// Variable to assign
 		Variable var = LangStorage.getVariable(variable_name);
 
@@ -89,9 +89,11 @@ public class AssignVertex extends LVertex {
 				LabLang.builder.append(expr.buildString()).append(" = ");
 			}
 
-			LabLang.builder.append(var.values[i].toPlainString());
+			LabLang.builder.append(
+					LangStorage.printExponent ? var.values[i].toEngineeringString() : var.values[i].toPlainString());
 			if (!var.infls[i].equals(BigDecimal.ZERO)) {
-				LabLang.builder.append(" # ").append(var.infls[i].toPlainString());
+				LabLang.builder.append(" # ").append(
+						LangStorage.printExponent ? var.infls[i].toEngineeringString() : var.infls[i].toPlainString());
 			}
 			if (i + 1 < total_values) {
 				LabLang.builder.append(", ");

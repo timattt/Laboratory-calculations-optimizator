@@ -38,13 +38,13 @@ public class Welcome extends JPanel implements ActionListener {
 		setLayout(new GridBagLayout());
 		
 		welcome_text.setFont(new Font("Times new Roman", Font.BOLD, 20));
-		welcome_text.setText("Laboratory calculations optimizator\nVersion alpha 1.2");
+		welcome_text.setText("Laboratory calculations optimizator\nVersion alpha 1.3");
 		welcome_text.setEditable(false);
 		welcome_text.setFocusable(false);
 		
 		author.setBackground(GUI.getFrame().getBackground());
 		//author.setFont(new Font("Times new Roman", Font.BOLD, 30));
-		author.setText("Author timattt");
+		author.setText("Made by timatt, synthMoza, Fuzernity");
 		author.setEditable(false);
 		author.setFocusable(false);
 		

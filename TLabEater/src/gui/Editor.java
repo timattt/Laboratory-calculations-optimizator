@@ -60,24 +60,24 @@ public class Editor extends JPanel implements KeyListener {
 		tp.setEditable(false);
 		tp.setFocusable(false);
 		tp.setBackground(null);
-		add(tp, con);//!!!!!!!!!!!
+		add(tp, con);// !!!!!!!!!!!
 
 		tp = new JTextField("Compiled code:");
 		tp.setEditable(false);
 		tp.setFocusable(false);
 		tp.setBackground(null);
 		con.gridx = 1;
-		add(tp, con);//!!!!!!!!!!!
+		add(tp, con);// !!!!!!!!!!!
 
 		con.fill = GridBagConstraints.BOTH;
 		con.weightx = 0.5;
 		con.weighty = 1;
 		con.gridy = 1;
 		con.gridx = 0;
-		add(new JScrollPane(src_text_pane = new JEditorPane()), con);//!!!!!!!!!!!
+		add(new JScrollPane(src_text_pane = new JEditorPane()), con);// !!!!!!!!!!!
 
 		con.gridx = 1;
-		add(new JScrollPane(comp_text_pane = new JEditorPane()), con);//!!!!!!!!!!!
+		add(new JScrollPane(comp_text_pane = new JEditorPane()), con);// !!!!!!!!!!!
 
 		con.gridy = 2;
 		con.weightx = 0.5;
@@ -100,7 +100,7 @@ public class Editor extends JPanel implements KeyListener {
 		con.gridx = 0;
 		con.weightx = 0.5;
 		con.weighty = 0;
-		add(p, con);//!!!!!!!!!!!
+		add(p, con);// !!!!!!!!!!!
 
 		// INFO
 		p = new JPanel();
@@ -115,7 +115,7 @@ public class Editor extends JPanel implements KeyListener {
 
 		con.gridx = 1;
 		con.weightx = 0.5;
-		add(p, con);//!!!!!!!!!!!
+		add(p, con);// !!!!!!!!!!!
 
 		comp_text_pane.setEditable(false);
 		src_text_pane.addKeyListener(this);
@@ -125,7 +125,7 @@ public class Editor extends JPanel implements KeyListener {
 		src_text_pane.setFont(font);
 		comp_text_pane.setFont(font);
 		info_text_pane.setFont(font);
-		
+
 		info_text_pane.setText("No exception...");
 	}
 
@@ -134,7 +134,14 @@ public class Editor extends JPanel implements KeyListener {
 		this.comp_file = new File(src.getParent(), src.getName().replace(GUI.ext_dot, "") + "_compiled" + GUI.ext_dot);
 
 		try {
-			this.src_text_pane.setText(LabLang.readFile(src));
+			String code = LabLang.readFile(src);
+			if (code.length() == 0) {
+				code = "// Simple example\n$ a = 10 # 2;\n$ b = 20 # 3;\n$ c = a * b;\n";
+				this.src_text_pane.setText(code);
+				compile();
+			} else {
+				this.src_text_pane.setText(code);
+			}
 		} catch (FileNotFoundException e) {
 			e.printStackTrace();
 		}
