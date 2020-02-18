@@ -27,8 +27,6 @@ import java.math.BigDecimal;
 import java.math.MathContext;
 import java.util.Arrays;
 import java.util.Comparator;
-import java.util.LinkedList;
-import java.util.Scanner;
 
 import javax.imageio.ImageIO;
 
@@ -42,7 +40,7 @@ import lang.tree.vertices.ExprVertex;
  *
  */
 public class Functions {
-	
+
 	// Functions
 	static final Function loadCsv = new Function(1) {
 
@@ -52,44 +50,57 @@ public class Functions {
 			if (arg.getString() == null) {
 				LabLang.compilationError("Function loadCsv may have string as parameter!");
 			}
+
 			File file = new File(arg.getString());
 			try {
-				Scanner sc = new Scanner(file);
-				final String splt = "[/t/n ,]";
-				String names_str = sc.nextLine();
-				String[] divs = names_str.split(splt);
-				String[] names = new String[divs.length];
+				String text = LabLang.readFile(file);
+				final char[] delims = { '\t', ',' };
+				String[] lines = text.split("[\n\r]");
+				String[][] matrix = new String[lines.length][];
 
-				Variable[] vars = new Variable[divs.length];
+				for (int i = 0; i < lines.length; i++) {
+					for (char d : delims) {
+						lines[i] = lines[i].replace((d + "" + d), d + "NAN" + d);
+					}
+
+					lines[i] = lines[i] + ",";
+					String[] divs = lines[i].split("[\t,]");
+					matrix[i] = new String[divs.length];
+					for (int j = 0; j < divs.length; j++) {
+						matrix[i][j] = divs[j];
+					}
+				}
+
+				Variable[] vars = new Variable[matrix[0].length];
 				for (int i = 0; i < vars.length; i++) {
-					vars[i] = LangStorage.getVariable(names[i] = divs[i]);
+					vars[i] = LangStorage.getVariable(matrix[0][i]);
+					vars[i].setSize(matrix.length - 1);
 				}
-
-				LinkedList<String> lines = new LinkedList<String>();
-				while (sc.hasNextLine()) {
-					lines.add(sc.nextLine());
-				}
-
-				for (int i = 0; i < vars.length; i++) {
-					vars[i].setSize(lines.size());
-				}
-
-				for (int j = 0; !lines.isEmpty(); j++) {
-					String line = lines.removeFirst();
-					divs = line.split(splt);
-
-					for (int i = 0; i < vars.length; i++) {
-						vars[i].values[j] = BigDecimal.valueOf(Double.parseDouble(divs[i]));
-						vars[i].infls[j] = BigDecimal.ZERO;
+				for (int i = 0; i < matrix.length - 1; i++) {
+					for (int j = 0; j < matrix[i].length; j++) {
+						if (matrix[i + 1][j].equals("NAN")) {
+							if (i != 0 && matrix[i][j].equals("NAN")) {
+								continue;
+							}
+							BigDecimal[] na = new BigDecimal[i];
+							BigDecimal[] ni = new BigDecimal[i];
+							for (int k = 0; k < na.length; k++) {
+								na[k] = vars[j].values[k];
+								ni[k] = BigDecimal.ZERO;
+							}
+							vars[j].values = na;
+							vars[j].infls = ni;
+						} else {
+							vars[j].values[i] = new BigDecimal(Double.parseDouble(matrix[i + 1][j]));
+							vars[j].infls[i] = BigDecimal.ZERO;
+						}
 					}
 				}
 
 				for (int i = 0; i < vars.length; i++) {
 					Variable v = vars[i];
-					LabLang.writeVariable(names[i], v);
+					LabLang.writeVariable(matrix[0][i], v);
 				}
-
-				sc.close();
 			} catch (Exception e) {
 				e.printStackTrace();
 				LabLang.compilationError("Function loadCsv can not read file!");
