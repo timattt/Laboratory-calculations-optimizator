@@ -44,7 +44,7 @@ public class Tokenizer {
 
 		return false;
 	}
-	
+
 	private static boolean isNumber(char s) {
 		return s >= '0' && s <= '9';
 	}
@@ -57,13 +57,20 @@ public class Tokenizer {
 	 * @return - array of tokens.
 	 */
 	public static Token[] tokenize(String text) {
-		text = text + "\n";
-
-		for (int i = 1; i < text.length(); i++) {
-			if (text.charAt(i - 1) == '/' && text.charAt(i) == '/') {
-				text = text.replace(text.substring(i - 1, text.indexOf("\n", i)), "\n");
+		String text_ = "";
+		boolean com = false;
+		for (int i = 0; i < text.length() - 1; i++) {
+			if (text.charAt(i) == '/' && text.charAt(i + 1) == '/') {
+				com = true;
+			}
+			if (text.charAt(i) == '\n') {
+				com = false;
+			}
+			if (!com) {
+				text_ += text.charAt(i);
 			}
 		}
+		text = text_;
 
 		// Checking quotes
 		int count_ = 0;
@@ -124,12 +131,13 @@ public class Tokenizer {
 			}
 
 			boolean isOperator = isOperator(s);
-			
+
 			// CHECKING something like 10E-2
-			if (s == '-' && i > 0 && (text.charAt(i - 1) == 'E' || text.charAt(i - 1) == 'e') && isNumber(text.charAt(start + 1))) {
+			if (s == '-' && i > 0 && (text.charAt(i - 1) == 'E' || text.charAt(i - 1) == 'e')
+					&& isNumber(text.charAt(start + 1))) {
 				isOperator = false;
 			}
-			
+
 			if (isDividor(text.charAt(i)) || isOperator) {
 				int end = i;
 
@@ -142,10 +150,10 @@ public class Tokenizer {
 						type = TokenType.number;
 					} catch (Exception e) {
 						type = TokenType.name;
-						
+
 						if (isNumber(value.charAt(0))) {
 							LabLang.syntaxError("Name may not starts with number!", line_num);
-						} 
+						}
 					}
 
 					raw.add(new Token(type, value, line_num));
@@ -164,7 +172,6 @@ public class Tokenizer {
 			}
 
 		}
-
 		return toArray(raw);
 	}
 

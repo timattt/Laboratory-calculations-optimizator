@@ -30,6 +30,7 @@ import java.util.Comparator;
 
 import javax.imageio.ImageIO;
 
+import bigMath.BigDecimalMath;
 import bigMath.DefaultBigDecimalMath;
 import lang.LangStorage.Function;
 import lang.LangStorage.Variable;
@@ -42,6 +43,21 @@ import lang.tree.vertices.ExprVertex;
 public class Functions {
 
 	// Functions
+	static final Function exp = new Function(1) {
+
+		@Override
+		public BigDecimal invoke(ExprVertex[] args) {
+			return DefaultBigDecimalMath.pow(BigDecimalMath.e(MathContext.DECIMAL128), args[0].process()[0]);
+		}
+
+		@Override
+		public ExprVertex diff(ExprVertex v, String var) {
+			ExprVertex arg = (ExprVertex) v.getChildren()[0];
+			return cOp('*', arg.dif(var), v.copy());
+		}
+
+	};
+	
 	static final Function loadCsv = new Function(1) {
 
 		@Override
@@ -51,23 +67,32 @@ public class Functions {
 				LabLang.compilationError("Function loadCsv may have string as parameter!");
 			}
 
-			File file = new File(arg.getString());
+			File file = new File(LabLang.homeDirectory, arg.getString());
 			try {
 				String text = LabLang.readFile(file);
-				final char[] delims = { '\t', ',' };
-				String[] lines = text.split("[\n\r]");
+				final char[] delims = { ',', '\t' };
+				String[] lines = text.split("\n");
 				String[][] matrix = new String[lines.length][];
 
 				for (int i = 0; i < lines.length; i++) {
 					for (char d : delims) {
-						lines[i] = lines[i].replace((d + "" + d), d + "NAN" + d);
+						lines[i] = lines[i].replace(d, ',');
 					}
+					lines[i] = lines[i].replace(" ", "");
+					while (lines[i].contains(",,")) {
+						lines[i] = lines[i].replace(",,", ',' + "NAN" + ',');
+					}
+					if (lines[i].charAt(lines[i].length() - 1) == ',') {
+						lines[i] = lines[i] + "NAN";
+					}
+					if (lines[i].charAt(0) == ',') {
+						lines[i] = "NAN" + lines[i];
+					}
+					String[] divs = lines[i].split(",");
 
-					lines[i] = lines[i] + ",";
-					String[] divs = lines[i].split("[\t,]");
 					matrix[i] = new String[divs.length];
 					for (int j = 0; j < divs.length; j++) {
-						matrix[i][j] = divs[j];
+						matrix[i][j] = divs[j] + "";
 					}
 				}
 
@@ -102,7 +127,6 @@ public class Functions {
 					LabLang.writeVariable(matrix[0][i], v);
 				}
 			} catch (Exception e) {
-				e.printStackTrace();
 				LabLang.compilationError("Function loadCsv can not read file!");
 			}
 
@@ -228,7 +252,7 @@ public class Functions {
 		@Override
 		public ExprVertex diff(ExprVertex v, String var) {
 			ExprVertex arg = (ExprVertex) v.getChildren()[0];
-			return cOp('/', arg.dif(var), arg);
+			return cOp('/', arg.dif(var), arg.copy());
 		}
 
 	};
