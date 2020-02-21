@@ -157,6 +157,11 @@ public class LangStorage {
 	public abstract static class Function {
 		public final int total_args;
 
+		/**
+		 * Accepted arguments quantity for this function. To check before invoke this function.
+		 * If the value is -1 then there will be no checking.
+		 * @param total_args
+		 */
 		protected Function(int total_args) {
 			this.total_args = total_args;
 		}
