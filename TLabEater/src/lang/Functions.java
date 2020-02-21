@@ -8,9 +8,9 @@ import static lang.InfilicityCounter.rountToFirstSignificantDigit;
 import static lang.LabLang.compilationError;
 import static lang.LangStorage.getVariable;
 import static lang.LangStorage.hasVariable;
-import static lang.tree.vertices.ExprVertex.cC;
-import static lang.tree.vertices.ExprVertex.cF;
-import static lang.tree.vertices.ExprVertex.cOp;
+import static lang.tree.vertices.ExprVertex.createConstant;
+import static lang.tree.vertices.ExprVertex.createFunction;
+import static lang.tree.vertices.ExprVertex.createOperation;
 
 import java.awt.BasicStroke;
 import java.awt.Color;
@@ -53,7 +53,7 @@ public class Functions {
 		@Override
 		public ExprVertex diff(ExprVertex v, String var) {
 			ExprVertex arg = (ExprVertex) v.getChildren()[0];
-			return cOp('*', arg.dif(var), v.copy());
+			return createOperation('*', arg.dif(var), v.copy());
 		}
 
 	};
@@ -252,7 +252,7 @@ public class Functions {
 		@Override
 		public ExprVertex diff(ExprVertex v, String var) {
 			ExprVertex arg = (ExprVertex) v.getChildren()[0];
-			return cOp('/', arg.dif(var), arg.copy());
+			return createOperation('/', arg.dif(var), arg.copy());
 		}
 
 	};
@@ -267,7 +267,7 @@ public class Functions {
 		@Override
 		public ExprVertex diff(ExprVertex v, String var) {
 			ExprVertex arg = (ExprVertex) v.getChildren()[0];
-			return cOp('*', cF("cos", arg.copy()), arg.dif(var));
+			return createOperation('*', createFunction("cos", arg.copy()), arg.dif(var));
 		}
 
 	};
@@ -282,7 +282,7 @@ public class Functions {
 		@Override
 		public ExprVertex diff(ExprVertex v, String var) {
 			ExprVertex arg = (ExprVertex) v.getChildren()[0];
-			return cOp('*', cC(BigDecimal.ONE.negate()), cOp('*', cF("sin", arg.copy()), arg.dif(var)));
+			return createOperation('*', createConstant(BigDecimal.ONE.negate()), createOperation('*', createFunction("sin", arg.copy()), arg.dif(var)));
 		}
 
 	};

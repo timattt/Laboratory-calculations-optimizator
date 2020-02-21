@@ -101,21 +101,21 @@ public class ExprVertex extends LVertex {
 		}
 	}
 
-	public static ExprVertex cOp(char oper, ExprVertex l, ExprVertex r) {
+	public static ExprVertex createOperation(char oper, ExprVertex l, ExprVertex r) {
 		ExprVertex res = new ExprVertex();
 		res.operator = oper;
 		res.children = new ExprVertex[] { l, r };
 		return res;
 	}
 
-	public static ExprVertex cF(String name, ExprVertex arg) {
+	public static ExprVertex createFunction(String name, ExprVertex arg) {
 		ExprVertex res = new ExprVertex();
 		res.funct = name;
 		res.children = new ExprVertex[] { arg };
 		return res;
 	}
 
-	public static ExprVertex cC(BigDecimal val) {
+	public static ExprVertex createConstant(BigDecimal val) {
 		ExprVertex res = new ExprVertex();
 		res.constant = val;
 		return res;
@@ -314,17 +314,17 @@ public class ExprVertex extends LVertex {
 		if (operator != 0) {
 			switch (operator) {
 			case '+':
-				return cOp('+', l().dif(var), r().dif(var));
+				return createOperation('+', l().dif(var), r().dif(var));
 			case '-':
-				return cOp('-', l().dif(var), r().dif(var));
+				return createOperation('-', l().dif(var), r().dif(var));
 			case '*':
-				return cOp('+', cOp('*', l().copy(), r().dif(var)), cOp('*', r().copy(), l().dif(var)));
+				return createOperation('+', createOperation('*', l().copy(), r().dif(var)), createOperation('*', r().copy(), l().dif(var)));
 			case '/':
-				return cOp('/', cOp('-', cOp('*', l().dif(var), r().copy()), cOp('*', r().dif(var), l().copy())),
-						cOp('^', r().copy(), cC(BigDecimal.valueOf(2))));
+				return createOperation('/', createOperation('-', createOperation('*', l().dif(var), r().copy()), createOperation('*', r().dif(var), l().copy())),
+						createOperation('^', r().copy(), createConstant(BigDecimal.valueOf(2))));
 			case '^':
-				return cOp('*', this.copy(), cOp('+', cOp('*', r().dif(var), cF("ln", l().copy())),
-						cOp('/', cOp('*', r().copy(), l().dif(var)), l().copy())));
+				return createOperation('*', this.copy(), createOperation('+', createOperation('*', r().dif(var), createFunction("ln", l().copy())),
+						createOperation('/', createOperation('*', r().copy(), l().dif(var)), l().copy())));
 			// !
 			case 'n':
 				ExprVertex cp = this.copy();
@@ -336,13 +336,13 @@ public class ExprVertex extends LVertex {
 		}
 		if (variable != null) {
 			if (variable.equals(var)) {
-				res = cC(BigDecimal.ONE);
+				res = createConstant(BigDecimal.ONE);
 			} else {
-				res = cC(BigDecimal.ZERO);
+				res = createConstant(BigDecimal.ZERO);
 			}
 		}
 		if (constant != null) {
-			res = cC(BigDecimal.ZERO);
+			res = createConstant(BigDecimal.ZERO);
 		}
 		if (funct != null) {
 			res = LangStorage.getFunction(funct).diff(this, var);

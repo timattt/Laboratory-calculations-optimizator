@@ -42,6 +42,8 @@ public class LangStorage {
 	 * Initializes functions and variables storage.
 	 */
 	public static void init() {
+		printExponent = false;
+		
 		vars.clear();
 		funcs.clear();
 
@@ -164,10 +166,4 @@ public class LangStorage {
 		public abstract ExprVertex diff(ExprVertex v, String var);
 	}
 
-	/**
-	 * Invokes when new compilation begins.
-	 */
-	public static void preInit() {
-		printExponent = false;
-	}
 }

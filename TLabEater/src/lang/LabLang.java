@@ -46,6 +46,11 @@ public class LabLang {
 		return b.toString();
 	}
 
+	/**
+	 * Prints variable to compiled code
+	 * @param name
+	 * @param var
+	 */
 	public static void writeVariable(String name, Variable var) {
 		int total_values = var.values.length;
 		LabLang.builder.append(name + " = ");
@@ -70,6 +75,12 @@ public class LabLang {
 		LabLang.builder.append(";\n");
 	}
 
+	/**
+	 * Writes this string into given file
+	 * @param f
+	 * @param str
+	 * @throws IOException
+	 */
 	public static void writeFile(File f, String str) throws IOException {
 		BufferedWriter wr = new BufferedWriter(new FileWriter(f));
 
@@ -96,7 +107,6 @@ public class LabLang {
 	 */
 	public static String parseLabLang(String in, File dir) throws IOException {
 		homeDirectory = dir;
-		LangStorage.preInit();
 
 		// tokenizing text
 		Token[] tokens = Tokenizer.tokenize(in);
