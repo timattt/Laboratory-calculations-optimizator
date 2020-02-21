@@ -7,7 +7,7 @@ import gui.GUI;
 
 /**
  * @author timat
- *
+ * @author tim
  */
 public class Main {
 

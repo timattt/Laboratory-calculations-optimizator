@@ -42,6 +42,8 @@ import lang.LangStorage.Variable;
 import lang.tree.vertices.ExprVertex;
 
 import com.roveramd.RoverCSV;
+import com.roveramd.RoverCSV.CSVMissingColumnValuesException;
+import com.roveramd.RoverCSV.CSVUnfinishedOrCorruptFileException;
 
 /**
  * @author timat
@@ -179,16 +181,53 @@ public class Functions {
 	static final Function makeCsv = new Function(-1) {
 		@Override
 		public BigDecimal invoke(ExprVertex[] args) {
-			if (args.length < 2 || ((args.length - 1) % 2) != 0)
+			if (args.length < 2)
 				LabLang.compilationError("Not enough arguments: please specify the path to the CSV file and at least one variable to dump.");
 			String pathNonAbsolute = args[0].getString();
 			String pathAbsolute = new File(LabLang.homeDirectory, pathNonAbsolute).getAbsolutePath();
-			Map<String, String> mp = new HashMap<String, String>();
-			for (int i = 1; i < args.length; i += 2) {
+			Map<String, BigDecimal[]> mp = new HashMap<>();
+			int maximum = 0;
+			for (int i = 1; i < args.length; i++) {
 				String name = args[i].getVariable();
 				if (name == null)
 					LabLang.compilationError("Missing name for positional argument #" + (i + 2));
-				System.err.println("name = " + name);
+				BigDecimal[] decm = getVariable(name).values;
+				if (decm.length > maximum)
+					maximum = decm.length;
+				mp.put(name, decm);
+			}
+			RoverCSV writer = new RoverCSV(mp.keySet());
+			Set<String> keySet = mp.keySet();
+			for (int i = 0; i < maximum; i++) {
+				Iterator<String> keyIter = keySet.iterator();
+				Map<String, String> resultingRow = new HashMap<>();
+				while (keyIter.hasNext()) {
+					String keyName = keyIter.next();
+					BigDecimal[] keyValue = mp.get(keyName);
+					String addedValue = "NaN";
+					if (keyValue.length > i)
+						addedValue = keyValue[i].toPlainString();
+					resultingRow.put(keyName, addedValue);
+				}
+				try {
+					writer.add(resultingRow);
+				} catch (CSVMissingColumnValuesException e) {
+					e.printStackTrace();
+					LabLang.compilationError("CSVMissingColumnValuesException thrown, an internal error has occured, please investigate.");
+				} catch (CSVUnfinishedOrCorruptFileException e) {
+					e.printStackTrace();
+					LabLang.compilationError("CSV file corrupt, please recreate the CSV file manually.");
+				}
+			}
+			try {
+				String wt = writer.join();
+				LabLang.writeFile(new File(pathAbsolute), wt);
+			} catch (CSVUnfinishedOrCorruptFileException e) {
+				e.printStackTrace();
+				LabLang.compilationError("CSVUnfinishedOrCorruptFileException thrown, an internal error has occured, please investigate.");
+			} catch (IOException e) {
+				e.printStackTrace();
+				LabLang.compilationError("I/O error.");
 			}
 			return null;
 		}
