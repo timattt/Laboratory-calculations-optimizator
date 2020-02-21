@@ -31,6 +31,7 @@ public class LabLang {
 	 */
 	public static StringBuilder builder;
 	public static File homeDirectory;
+	public static String applicationParentDirectory = System.getProperty("user.dir");
 
 	public static String readFile(File f) throws FileNotFoundException {
 		StringBuilder b = new StringBuilder();
@@ -90,7 +91,7 @@ public class LabLang {
 	}
 
 	public static void syntaxError(String mes, int line_num) {
-		throw new RuntimeException("Syntax error in line " + line_num + ". " + mes);
+		throw new RuntimeException("Syntax error in line " + line_num + ". " + mes + "|" + line_num);
 	}
 
 	public static void compilationError(String mes) {

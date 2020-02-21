@@ -15,6 +15,9 @@ import javax.swing.SwingUtilities;
 import javax.swing.filechooser.FileNameExtensionFilter;
 import javax.swing.filechooser.FileSystemView;
 
+import com.roveramd.RoverGTKRCParser;
+import static lang.LabLang.applicationParentDirectory;
+
 /**
  * @author timat
  *
@@ -25,11 +28,22 @@ public class GUI {
 
 	private static Editor editor = new Editor();
 	private static Welcome welcome = new Welcome();
+	private static RoverGTKRCParser configParser = null;
 
 	public static void init() {
+		String configPath = applicationParentDirectory + "/lcorc.conf";
+		System.err.println("configPath = " + configPath);
+		try {
+			configParser = new RoverGTKRCParser(configPath);
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+		int width = (configParser != null && configParser.containsInteger("lco-window-width")) ? configParser.getInteger("lco-window-width") : 800;
+		int height = (configParser != null && configParser.containsInteger("lco-window-height")) ? configParser.getInteger("lco-window-height") : 800;
+		
 		frame.setTitle("Laboratory calculator");
 		frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-		frame.setSize(800, 800);
+		frame.setSize(width, height);
 
 		frame.setContentPane(welcome);
 		initMenu();
@@ -58,6 +72,7 @@ public class GUI {
 			e.printStackTrace();
 		}
 
+		editor.loadNecessarySettings(configParser);
 		editor.setSrcFile(src_file);
 
 		frame.setContentPane(editor);
@@ -75,6 +90,7 @@ public class GUI {
 			return;
 		}
 
+		editor.loadNecessarySettings(configParser);
 		editor.setSrcFile(src_file);
 
 		frame.setContentPane(editor);

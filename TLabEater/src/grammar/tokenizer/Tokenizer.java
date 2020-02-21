@@ -143,6 +143,7 @@ public class Tokenizer {
 
 				if (start + 1 != end) {
 					String value = text.substring(start + 1, end);
+					//System.out.println("value = " + value);
 					TokenType type = null;
 
 					try {
@@ -152,7 +153,7 @@ public class Tokenizer {
 						type = TokenType.name;
 
 						if (isNumber(value.charAt(0))) {
-							LabLang.syntaxError("Name may not starts with number!", line_num);
+							LabLang.syntaxError("Name may not start with number!", line_num);
 						}
 					}
 
