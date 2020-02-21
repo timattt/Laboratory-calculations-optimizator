@@ -101,8 +101,11 @@ public class Editor extends JPanel implements KeyListener {
 		autoCompile.addActionListener((event) -> {
 			this.autoCompile = !this.autoCompile;
 			justCompiled = false;
-			if (privateConverter != null)
+			if (privateConverter != null) {
+				src_text_pane.setContentType("text/plain");
 				src_text_pane.setText(privateConverter.toString());
+			}
+				
 		});
 		p.add(compile, BorderLayout.NORTH);
 		p.add(autoCompile, BorderLayout.SOUTH);
