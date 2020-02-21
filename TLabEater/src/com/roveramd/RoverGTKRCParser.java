@@ -10,6 +10,10 @@ public class RoverGTKRCParser {
 	private Map<String, Integer> integerProperties = new HashMap<>();
 	private String configPath = "";
 	
+	//
+	// Creates a new instance of RoverGTKRCParser - a class that can
+	// read and represent GTK+ 2-styled config files.
+	//
 	public RoverGTKRCParser(String path) throws FileNotFoundException, IOException {
 		if (! new File(path).exists())
 			throw new FileNotFoundException();
@@ -45,30 +49,51 @@ public class RoverGTKRCParser {
 		}
 	}
 	
+	// 
+	// Returns true or false basing on the fact if the specified key
+	// is specified in the config and is a string.
+	//
 	public boolean containsString(String label) {
 		return stringProperties.containsKey(label);
 	}
 	
+	// 
+	// Returns true or false basing on the fact if the specified key
+	// is specified in the config and is an integer.
+	//
 	public boolean containsInteger(String label) {
 		return integerProperties.containsKey(label);
 	}
 	
+	// 
+	// Returns true or false basing on the fact if the specified key
+	// is specified in the config and is a boolean.
+	//
 	public boolean containsBoolean(String label) {
 		return booleanProperties.containsKey(label);
 	}
 	
+	//
+	// Returns the value of the specified key.
+	//
 	public boolean getBoolean(String label) {
 		if (containsBoolean(label))
 			return booleanProperties.get(label);
 		return false;
 	}
 	
+	//
+	// Returns the value of the specified key.
+	//
 	public String getString(String label) {
 		if (containsString(label))
 			return stringProperties.get(label);
 		return null;
 	}
 	
+	//
+	// Returns the value of the specified key.
+	//
 	public int getInteger(String label) {
 		if (containsInteger(label))
 			return integerProperties.get(label);

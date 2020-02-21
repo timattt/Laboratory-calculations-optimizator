@@ -100,12 +100,11 @@ public class Functions {
 						}
 						Variable workingVar = variablesAvailable.get(heading);
 						String workingValue = row.get(heading);
-						if (!workingValue.toLowerCase().startsWith("nan") && !workingValue.isEmpty()) {
+						if (!workingValue.toLowerCase().startsWith("nan") && !workingValue.isEmpty())
 							workingVar.values[idx] = new BigDecimal(Double.parseDouble(workingValue));
-							workingVar.infls[idx] = BigDecimal.ZERO;
-						} else {
-							// TODO: NaN отхендлить правильно
-						}
+						else
+							throw new RuntimeException("Repetitive not-a-number value in the CSV file.");
+						workingVar.infls[idx] = BigDecimal.ZERO;
 						variablesAvailable.remove(heading);
 						variablesAvailable.put(heading, workingVar);
 					}
@@ -114,6 +113,7 @@ public class Functions {
 				Iterator<String> vaIter = variablesAvailable.keySet().iterator();
 				while (vaIter.hasNext()) {
 					String name = vaIter.next();
+					System.err.println("name = " + name);
 					Variable vr = variablesAvailable.get(name);
 					LabLang.writeVariable(name, vr);
 				}

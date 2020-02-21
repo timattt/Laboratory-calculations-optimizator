@@ -187,7 +187,8 @@ public class Editor extends JPanel implements KeyListener {
 			info_text_pane.setText("No exception...");
 			save();
 		} catch (Exception ex) {
-			if (ex.getMessage().length() == 0) {
+			System.err.println(ex);
+			if (ex.getMessage() == null || ex.getMessage().length() == 0) {
 				info_text_pane.setText("Unresolved compilation error! Maybe bug!");
 				ex.printStackTrace();
 			} else

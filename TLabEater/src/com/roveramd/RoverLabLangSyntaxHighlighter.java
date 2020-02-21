@@ -15,11 +15,19 @@ public class RoverLabLangSyntaxHighlighter {
 	private String backgroundColor = "#FFFFFF";
 	private int preferredFontSize = 14;
 	
+	//
+	// Creates a new instance of RoverLabLangSyntaxHighlighter class - a class
+	// that can generate HTML page representing the highlighted HTML code and
+	// rendered in the source code browser.
+	//
 	public RoverLabLangSyntaxHighlighter(String input, int fontSize) {
 		preferredFontSize = fontSize;
 		setText(input);
 	}
 	
+	//
+	// Modifies the color palette used.
+	//
 	public void setColorScheme(String highlight, String quote, String inacc, String nums, String debug, String vbl, String bg, String other) {
 		variableColor = vbl;
 		commentColor = highlight;
@@ -31,15 +39,25 @@ public class RoverLabLangSyntaxHighlighter {
 		otherColor = other;
 	}
 	
+	//
+	// Makes the class store not only the original source code, but
+	// also generate and store the highlighted version of it.
+	//
 	public void setText(String in) {
 		highlightResult = parseUp(in);
 		originalText = in;
 	}
 	
+	// 
+	// Returns the highlighted version of the source code.
+	//
 	public String toHTML() {
 		return highlightResult;
 	}
 	
+	// 
+	// Returns the original version of the source code.
+	//
 	public String toString() {
 		return originalText;
 	}
