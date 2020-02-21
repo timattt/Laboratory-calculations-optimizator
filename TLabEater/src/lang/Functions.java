@@ -209,6 +209,7 @@ public class Functions {
 						addedValue = keyValue[i].toPlainString();
 					resultingRow.put(keyName, addedValue);
 				}
+				System.err.println("resultingRow = " + resultingRow);
 				try {
 					writer.add(resultingRow);
 				} catch (CSVMissingColumnValuesException e) {

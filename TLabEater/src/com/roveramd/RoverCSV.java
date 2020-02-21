@@ -227,7 +227,7 @@ public class RoverCSV {
             String hdr = headers[i];
             if (!rw.containsKey(hdr))
                 throw new CSVUnfinishedOrCorruptFileException();
-            result = first ? hdr : (result + preferredDelimiter + rw.get(hdr));
+            result = first ? rw.get(hdr) : (result + preferredDelimiter + rw.get(hdr));
             first = false;
         }
         return result;
