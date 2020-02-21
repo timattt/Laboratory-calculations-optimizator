@@ -12,6 +12,7 @@ import static lang.Functions.diff;
 import static lang.Functions.useExp;
 import static lang.Functions.disableExp;
 import static lang.Functions.loadCsv;
+import static lang.Functions.makeCsv;
 import static lang.Functions.exp;
 
 import java.math.BigDecimal;
@@ -56,6 +57,7 @@ public class LangStorage {
 		funcs.put("useExp", useExp);
 		funcs.put("disableExp", disableExp);
 		funcs.put("loadCsv", loadCsv);
+		funcs.put("makeCsv", makeCsv);
 		funcs.put("exp", exp);
 	}
 

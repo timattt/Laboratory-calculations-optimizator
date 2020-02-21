@@ -179,9 +179,17 @@ public class Functions {
 	static final Function makeCsv = new Function(-1) {
 		@Override
 		public BigDecimal invoke(ExprVertex[] args) {
-			if (args.length < 2)
+			if (args.length < 2 || ((args.length - 1) % 2) != 0)
 				LabLang.compilationError("Not enough arguments: please specify the path to the CSV file and at least one variable to dump.");
-			LabLang.compilationError("OwO not ready yet");
+			String pathNonAbsolute = args[0].getString();
+			String pathAbsolute = new File(LabLang.homeDirectory, pathNonAbsolute).getAbsolutePath();
+			Map<String, String> mp = new HashMap<String, String>();
+			for (int i = 1; i < args.length; i += 2) {
+				String name = args[i].getVariable();
+				if (name == null)
+					LabLang.compilationError("Missing name for positional argument #" + (i + 2));
+				System.err.println("name = " + name);
+			}
 			return null;
 		}
 		

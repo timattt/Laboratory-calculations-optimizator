@@ -75,6 +75,23 @@ public class RoverCSV {
         preferredDelimiter = ",";
     }
     
+    //
+    // The constructor that creates you an instance of RoverCSV that can be used
+    // to initialize an empty CSV with the specified headers.
+    //
+    public RoverCSV(Set<String> headersSet) {
+    	headers = new String[headersSet.size()];
+    	Iterator<String> itrtr = headersSet.iterator();
+    	int index = -1;
+    	while (itrtr.hasNext()) {
+    		index += 1;
+    		headers[index] = itrtr.next();
+    	}
+    	readContents = new ArrayList<>();
+    	associatedFile = null;
+    	preferredDelimiter = ",";
+    }
+    
     private void preprocessContents(String fn, String delimiter, int maxCharactersForPlainCSV) throws IOException, CSVUnfinishedOrCorruptFileException {
         String ctnt = "";
         try (FileReader ctntReader = new FileReader(fn)) {
