@@ -26,7 +26,12 @@ import java.io.IOException;
 import java.math.BigDecimal;
 import java.math.MathContext;
 import java.util.Arrays;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
 import java.util.Comparator;
+import java.util.Iterator;
+import java.util.HashMap;
 
 import javax.imageio.ImageIO;
 
@@ -36,9 +41,11 @@ import lang.LangStorage.Function;
 import lang.LangStorage.Variable;
 import lang.tree.vertices.ExprVertex;
 
+import com.roveramd.RoverCSV;
+
 /**
  * @author timat
- *
+ * @author tim
  */
 public class Functions {
 
@@ -58,78 +65,62 @@ public class Functions {
 
 	};
 	
-	static final Function loadCsv = new Function(1) {
-
+	static final Function loadCsv = new Function(-1) {
 		@Override
 		public BigDecimal invoke(ExprVertex[] args) {
-			ExprVertex arg = args[0];
-			if (arg.getString() == null) {
-				LabLang.compilationError("Function loadCsv may have string as parameter!");
+			ExprVertex vtxArg = args[0];
+			String essentialFileName = vtxArg.getString();
+			if (essentialFileName == null) {
+				LabLang.compilationError("It is required that you specify absolute or relative path to the CSV file that you want to read as the first argument to loadCsv()");
+				return null;
 			}
-
-			File file = new File(LabLang.homeDirectory, arg.getString());
+			String delimiter = ",";
+			if (args.length > 1 && args[1].getString() != null)
+				delimiter = args[1].getString();
 			try {
-				String text = LabLang.readFile(file);
-				final char[] delims = { ',', '\t' };
-				String[] lines = text.split("\n");
-				String[][] matrix = new String[lines.length][];
-
-				for (int i = 0; i < lines.length; i++) {
-					for (char d : delims) {
-						lines[i] = lines[i].replace(d, ',');
-					}
-					lines[i] = lines[i].replace(" ", "");
-					while (lines[i].contains(",,")) {
-						lines[i] = lines[i].replace(",,", ',' + "NAN" + ',');
-					}
-					if (lines[i].charAt(lines[i].length() - 1) == ',') {
-						lines[i] = lines[i] + "NAN";
-					}
-					if (lines[i].charAt(0) == ',') {
-						lines[i] = "NAN" + lines[i];
-					}
-					String[] divs = lines[i].split(",");
-
-					matrix[i] = new String[divs.length];
-					for (int j = 0; j < divs.length; j++) {
-						matrix[i][j] = divs[j] + "";
-					}
-				}
-
-				Variable[] vars = new Variable[matrix[0].length];
-				for (int i = 0; i < vars.length; i++) {
-					vars[i] = LangStorage.getVariable(matrix[0][i]);
-					vars[i].setSize(matrix.length - 1);
-				}
-				for (int i = 0; i < matrix.length - 1; i++) {
-					for (int j = 0; j < matrix[i].length; j++) {
-						if (matrix[i + 1][j].equals("NAN")) {
-							if (i != 0 && matrix[i][j].equals("NAN")) {
-								continue;
-							}
-							BigDecimal[] na = new BigDecimal[i];
-							BigDecimal[] ni = new BigDecimal[i];
-							for (int k = 0; k < na.length; k++) {
-								na[k] = vars[j].values[k];
-								ni[k] = BigDecimal.ZERO;
-							}
-							vars[j].values = na;
-							vars[j].infls = ni;
-						} else {
-							vars[j].values[i] = new BigDecimal(Double.parseDouble(matrix[i + 1][j]));
-							vars[j].infls[i] = BigDecimal.ZERO;
+				File file = new File(LabLang.homeDirectory, essentialFileName);
+				essentialFileName = file.getAbsolutePath();
+				RoverCSV csvRdr = new RoverCSV(essentialFileName, delimiter);
+				List<Map<String, String>> allRows = csvRdr.getAll();
+				Iterator<Map<String, String>> listIter = allRows.iterator();
+				Map<String, Variable> variablesAvailable = new HashMap<>();
+				int idx = 0;
+				while (listIter.hasNext()) {
+					Map<String, String> row = listIter.next();
+					Set<String> keysSet = row.keySet();
+					Iterator<String> keysIter = keysSet.iterator();
+					while (keysIter.hasNext()) {
+						String heading = keysIter.next();
+						if (!variablesAvailable.containsKey(heading)) {
+							Variable podstVar = LangStorage.getVariable(heading);
+							podstVar.setSize(allRows.size());
+							variablesAvailable.put(heading, podstVar);
 						}
+						Variable workingVar = variablesAvailable.get(heading);
+						String workingValue = row.get(heading);
+						if (!workingValue.toLowerCase().startsWith("nan") && !workingValue.isEmpty()) {
+							workingVar.values[idx] = new BigDecimal(Double.parseDouble(workingValue));
+							workingVar.infls[idx] = BigDecimal.ZERO;
+						} else {
+							// TODO: NaN отхендлить правильно
+						}
+						variablesAvailable.remove(heading);
+						variablesAvailable.put(heading, workingVar);
 					}
+					idx += 1;
 				}
-
-				for (int i = 0; i < vars.length; i++) {
-					Variable v = vars[i];
-					LabLang.writeVariable(matrix[0][i], v);
+				Iterator<String> vaIter = variablesAvailable.keySet().iterator();
+				while (vaIter.hasNext()) {
+					String name = vaIter.next();
+					Variable vr = variablesAvailable.get(name);
+					LabLang.writeVariable(name, vr);
 				}
-			} catch (Exception e) {
-				LabLang.compilationError("Function loadCsv can not read file!");
+				
+			} catch (IOException err) {
+				LabLang.compilationError("Failed to read file '" + essentialFileName + "'. ");
+			} catch (RoverCSV.CSVUnfinishedOrCorruptFileException e) {
+				LabLang.compilationError("File '" + essentialFileName + "' is either an incorrectly formatted CSV file or is not a CSV file at all. Don't forget to specify the delimiter as the second argument if the file is not delimited with commas.");
 			}
-
 			return null;
 		}
 
@@ -184,25 +175,40 @@ public class Functions {
 		}
 
 	};
+	
+	static final Function makeCsv = new Function(-1) {
+		@Override
+		public BigDecimal invoke(ExprVertex[] args) {
+			if (args.length < 2)
+				LabLang.compilationError("Not enough arguments: please specify the path to the CSV file and at least one variable to dump.");
+			LabLang.compilationError("OwO not ready yet");
+			return null;
+		}
+		
+		@Override
+		public ExprVertex diff(ExprVertex v, String var) {
+			return null;
+		}
+	};
 
 	static final Function makeGraph = new Function(-1) {
 
 		@Override
 		public BigDecimal invoke(ExprVertex[] args) {
 			if (args.length == 0 || (args.length) % 3 != 0) {
-				compilationError("Incorrect number of arguments in makeGraph function");
+				compilationError("Incorrect number of arguments for makeGraph function");
 			}
 			String img_name = args[args.length - 3].getString();
 			String x_axis_name = args[args.length - 2].getString();
 			String y_axis_name = args[args.length - 1].getString();
 			if (x_axis_name == null) {
-				compilationError("No x axis name for makeGraph function!");
+				compilationError("No x axis name specifed for makeGraph function!");
 			}
 			if (y_axis_name == null) {
-				compilationError("No y axis name for makeGraph function!");
+				compilationError("No y axis name specified for makeGraph function!");
 			}
 			if (img_name == null) {
-				compilationError("No image name for makeGraph function!");
+				compilationError("No image name specified for makeGraph function!");
 			}
 
 			Variable[] xs = new Variable[(args.length - 3) / 3];

@@ -44,7 +44,7 @@ public class Welcome extends JPanel implements ActionListener {
 		
 		author.setBackground(GUI.getFrame().getBackground());
 		//author.setFont(new Font("Times new Roman", Font.BOLD, 30));
-		author.setText("Made by timatt, synthMoza, Fuzernity");
+		author.setText("Made by timatt, synthMoza, Fuzernity, RoverAMD/timkoi");
 		author.setEditable(false);
 		author.setFocusable(false);
 		
@@ -70,7 +70,11 @@ public class Welcome extends JPanel implements ActionListener {
 		
 		
 		con.gridy = 1;
-		image.setIcon(new javax.swing.ImageIcon(getClass().getResource("/logo.png")));
+		try {
+			image.setIcon(new javax.swing.ImageIcon(getClass().getResource("/logo.png")));
+		} catch (Exception ex) {
+			ex.printStackTrace();
+		}
 		add(image, con);
 		
 		con.gridy = 3;
