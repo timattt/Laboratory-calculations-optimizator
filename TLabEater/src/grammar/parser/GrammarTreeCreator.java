@@ -228,7 +228,7 @@ public class GrammarTreeCreator {
 
 			T();
 
-			if (tryOperators('-', '+')) {
+			if (tryOperators('+')) {
 				Expr();
 			}
 

@@ -58,6 +58,9 @@ public class Tokenizer {
 	 */
 	public static Token[] tokenize(String text) {
 		text += "\n";
+		//!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+		text = text.replace("-", "+-");
+		//!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 		String text_ = "";
 		boolean com = false;
 		for (int i = 0; i < text.length() - 1; i++) {

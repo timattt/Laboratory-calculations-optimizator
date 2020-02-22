@@ -11,6 +11,7 @@ import java.io.IOException;
 import java.math.BigDecimal;
 import java.util.Scanner;
 
+import grammar.parser.DotWriter;
 import grammar.parser.GrammarTreeCreator;
 import grammar.parser.GrammarTreeCreator.Nonterminal;
 import grammar.tokenizer.Token;
@@ -125,13 +126,13 @@ public class LabLang {
 		LVertex lang = new HeadVertex(head);
 
 		// Debug
-		/*
+		
 		File dotfile = new File("dotsrc");
 		DotWriter.saveNonterminalAsDotFile(head, dotfile);
 		DotWriter.createDotImage("dotsrc", "img_gram");
 		DotWriter.saveLVertexAsDotFile(lang, dotfile);
 		DotWriter.createDotImage("dotsrc", "img_lang");
-		 */
+		
 
 		builder = new StringBuilder();
 
