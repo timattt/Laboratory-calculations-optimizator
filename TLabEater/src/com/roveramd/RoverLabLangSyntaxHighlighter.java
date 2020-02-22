@@ -14,14 +14,16 @@ public class RoverLabLangSyntaxHighlighter {
 	private String commentColor = "#C1C3CA";
 	private String backgroundColor = "#FFFFFF";
 	private int preferredFontSize = 14;
+	private String preferredFontFamily = "Verdana";
 	
 	//
 	// Creates a new instance of RoverLabLangSyntaxHighlighter class - a class
 	// that can generate HTML page representing the highlighted HTML code and
 	// rendered in the source code browser.
 	//
-	public RoverLabLangSyntaxHighlighter(String input, int fontSize) {
+	public RoverLabLangSyntaxHighlighter(String input, String fontFamily, int fontSize) {
 		preferredFontSize = fontSize;
+		preferredFontFamily = fontFamily;
 		setText(input);
 	}
 	
@@ -149,7 +151,7 @@ public class RoverLabLangSyntaxHighlighter {
 			}
 			resultToFlush.add(actualNewLine);
 		}
-		String result = "<div style=\"font-size: " + preferredFontSize + "; background-color: " + backgroundColor + "; color: " + otherColor + "\">" + joinList(resultToFlush, "<br>") + "</div>";
+		String result = "<div style=\"font-size: " + preferredFontSize + "; font-family: '" + preferredFontFamily + "'; background-color: " + backgroundColor + "; color: " + otherColor + "\">" + joinList(resultToFlush, "<br>") + "</div>";
 		System.err.println("Converted result:\n" + result);
 		return result;
 	}

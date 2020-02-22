@@ -43,7 +43,7 @@ public class Editor extends JPanel implements KeyListener {
 	private RoverLabLangSyntaxHighlighter privateConverter = null;
 
 	// Font
-	private final Font font = new Font("Times new roman", Font.PLAIN, 20);
+	private Font font = new Font("Times new roman", Font.PLAIN, 20);
 
 	// Files
 	private File src_file;
@@ -145,6 +145,16 @@ public class Editor extends JPanel implements KeyListener {
 		if (configParser == null)
 			return;
 		enableSyntaxHighlighting = (configParser.containsBoolean("lco-hl-feature")) ? configParser.getBoolean("lco-hl-feature") : true;
+		String fontFamily = "Times New Roman";
+		int fontSize = 20;
+		if (configParser.containsInteger("lco-font-size"))
+			fontSize = configParser.getInteger("lco-font-size");
+		if (configParser.containsString("lcon-font-family"))
+			fontFamily = configParser.getString("lco-font-family");
+		font = new Font(fontFamily, Font.PLAIN, fontSize);
+		src_text_pane.setFont(font);
+		comp_text_pane.setFont(font);
+		info_text_pane.setFont(font);
 		for (int i = 0; i < 8; i++) {
 			String vlName = "lco-hl-color" + i;
 			if (configParser.containsString(vlName))
@@ -172,7 +182,7 @@ public class Editor extends JPanel implements KeyListener {
 			return;
 		String src_code = src_text_pane.getText();
 		if (privateConverter == null) {
-			privateConverter = new RoverLabLangSyntaxHighlighter(src_code, font.getSize());
+			privateConverter = new RoverLabLangSyntaxHighlighter(src_code, font.getFamily(), font.getSize());
 			privateConverter.setColorScheme(colorPalette[0], colorPalette[1], colorPalette[2], colorPalette[3], colorPalette[4], colorPalette[5], colorPalette[6], colorPalette[7]);
 		} else
 			privateConverter.setText(src_code);

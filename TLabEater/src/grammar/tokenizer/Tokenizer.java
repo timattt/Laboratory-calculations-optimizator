@@ -57,6 +57,7 @@ public class Tokenizer {
 	 * @return - array of tokens.
 	 */
 	public static Token[] tokenize(String text) {
+		text += "\n";
 		String text_ = "";
 		boolean com = false;
 		for (int i = 0; i < text.length() - 1; i++) {

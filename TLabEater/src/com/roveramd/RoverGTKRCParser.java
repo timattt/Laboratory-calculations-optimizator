@@ -32,18 +32,20 @@ public class RoverGTKRCParser {
 		Iterator<String> lineIterator = iterableCtnt.iterator();
 		while (lineIterator.hasNext()) {
 			String line = lineIterator.next();
-			List<String> lineSplit = respectiveSplit(line, '=');
-			if (lineSplit.size() >= 2) {
-				String key = lineSplit.get(0).trim();
-				String valueRaw = lineSplit.get(1).trim();
-				if (valueRaw.length() >= 2 && valueRaw.charAt(0) == '"' && valueRaw.charAt(valueRaw.length() - 1) == '"')
-					stringProperties.put(key, valueRaw.substring(1, valueRaw.length() - 1));
-				else if (valueRaw.equals("yes") || valueRaw.equals("no") || valueRaw.equals("true") || valueRaw.equals("false") || valueRaw.equals("meow") || valueRaw.equals("bark")) {
-					boolean vl = (valueRaw.equals("yes") || valueRaw.equals("true") || valueRaw.equals("meow"));
-					booleanProperties.put(key, vl);
-				} else {
-					int vl = Integer.parseInt(valueRaw);
-					integerProperties.put(key, vl);
+			if (!line.startsWith("//") && !line.startsWith("#")) {
+				List<String> lineSplit = respectiveSplit(line, '=');
+				if (lineSplit.size() >= 2) {
+					String key = lineSplit.get(0).trim();
+					String valueRaw = lineSplit.get(1).trim();
+					if (valueRaw.length() >= 2 && valueRaw.charAt(0) == '"' && valueRaw.charAt(valueRaw.length() - 1) == '"')
+						stringProperties.put(key, valueRaw.substring(1, valueRaw.length() - 1));
+					else if (valueRaw.equals("yes") || valueRaw.equals("no") || valueRaw.equals("true") || valueRaw.equals("false") || valueRaw.equals("meow") || valueRaw.equals("bark")) {
+						boolean vl = (valueRaw.equals("yes") || valueRaw.equals("true") || valueRaw.equals("meow"));
+						booleanProperties.put(key, vl);
+					} else {
+						int vl = Integer.parseInt(valueRaw);
+						integerProperties.put(key, vl);
+					}
 				}
 			}
 		}
