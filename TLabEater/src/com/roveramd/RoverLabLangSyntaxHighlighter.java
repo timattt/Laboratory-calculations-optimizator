@@ -9,6 +9,7 @@ public class RoverLabLangSyntaxHighlighter {
 	private String inaccColor = "#DCB559";
 	private String numbersColor = "#5C6E9E";
 	private String debugColor = "#597CDC";
+	@SuppressWarnings("unused")
 	private String variableColor = "#754B4B";
 	private String otherColor = "#000000";
 	private String commentColor = "#C1C3CA";
