@@ -124,7 +124,7 @@ public class Tokenizer {
 		}
 
 		text = text_no_strings.toString();
-
+		
 		// Checking operators, names and numbers
 		line_num = 1;
 		start = -1;

@@ -39,7 +39,8 @@ public class Editor extends JPanel implements KeyListener {
 	private JTextPane info_text_pane;
 	private boolean justCompiled = false;
 	private boolean enableSyntaxHighlighting = false;
-	private String[] colorPalette = { "#C1C3CA", "#7CDC59", "#DCB559", "#5C6E9E", "#597CDC", "#754B4B", "#FFFFFF", "#000000" };
+	private String[] colorPalette = { "#C1C3CA", "#7CDC59", "#DCB559", "#5C6E9E", "#597CDC", "#754B4B", "#FFFFFF",
+			"#000000" };
 	private RoverLabLangSyntaxHighlighter privateConverter = null;
 
 	// Font
@@ -103,9 +104,9 @@ public class Editor extends JPanel implements KeyListener {
 			justCompiled = false;
 			if (privateConverter != null) {
 				src_text_pane.setContentType("text/plain");
-				src_text_pane.setText(privateConverter.toString());
+				src_text_pane.setText(src_text_pane.getText());
 			}
-				
+
 		});
 		p.add(compile, BorderLayout.NORTH);
 		p.add(autoCompile, BorderLayout.SOUTH);
@@ -140,11 +141,13 @@ public class Editor extends JPanel implements KeyListener {
 
 		info_text_pane.setText("No exception...");
 	}
-	
+
 	public void loadNecessarySettings(RoverGTKRCParser configParser) {
 		if (configParser == null)
 			return;
-		enableSyntaxHighlighting = (configParser.containsBoolean("lco-hl-feature")) ? configParser.getBoolean("lco-hl-feature") : true;
+		enableSyntaxHighlighting = (configParser.containsBoolean("lco-hl-feature"))
+				? configParser.getBoolean("lco-hl-feature")
+				: true;
 		String fontFamily = "Times New Roman";
 		int fontSize = 20;
 		if (configParser.containsInteger("lco-font-size"))
@@ -183,7 +186,8 @@ public class Editor extends JPanel implements KeyListener {
 		String src_code = src_text_pane.getText();
 		if (privateConverter == null) {
 			privateConverter = new RoverLabLangSyntaxHighlighter(src_code, font.getFamily(), font.getSize());
-			privateConverter.setColorScheme(colorPalette[0], colorPalette[1], colorPalette[2], colorPalette[3], colorPalette[4], colorPalette[5], colorPalette[6], colorPalette[7]);
+			privateConverter.setColorScheme(colorPalette[0], colorPalette[1], colorPalette[2], colorPalette[3],
+					colorPalette[4], colorPalette[5], colorPalette[6], colorPalette[7]);
 		} else
 			privateConverter.setText(src_code);
 		if (!autoCompile && enableSyntaxHighlighting) {
