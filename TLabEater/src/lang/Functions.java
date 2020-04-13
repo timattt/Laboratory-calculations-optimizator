@@ -66,14 +66,15 @@ public class Functions {
 		}
 
 	};
-	
+
 	static final Function loadCsv = new Function(-1) {
 		@Override
 		public BigDecimal invoke(ExprVertex[] args) {
 			ExprVertex vtxArg = args[0];
 			String essentialFileName = vtxArg.getString();
 			if (essentialFileName == null) {
-				LabLang.compilationError("It is required that you specify absolute or relative path to the CSV file that you want to read as the first argument to loadCsv()");
+				LabLang.compilationError(
+						"It is required that you specify absolute or relative path to the CSV file that you want to read as the first argument to loadCsv()");
 				return null;
 			}
 			String delimiter = ",";
@@ -117,11 +118,12 @@ public class Functions {
 					Variable vr = variablesAvailable.get(name);
 					LabLang.writeVariable(name, vr);
 				}
-				
+
 			} catch (IOException err) {
 				LabLang.compilationError("Failed to read file '" + essentialFileName + "'. ");
 			} catch (RoverCSV.CSVUnfinishedOrCorruptFileException e) {
-				LabLang.compilationError("File '" + essentialFileName + "' is either an incorrectly formatted CSV file or is not a CSV file at all. Don't forget to specify the delimiter as the second argument if the file is not delimited with commas.");
+				LabLang.compilationError("File '" + essentialFileName
+						+ "' is either an incorrectly formatted CSV file or is not a CSV file at all. Don't forget to specify the delimiter as the second argument if the file is not delimited with commas.");
 			}
 			return null;
 		}
@@ -177,12 +179,13 @@ public class Functions {
 		}
 
 	};
-	
+
 	static final Function makeCsv = new Function(-1) {
 		@Override
 		public BigDecimal invoke(ExprVertex[] args) {
 			if (args.length < 2)
-				LabLang.compilationError("Not enough arguments: please specify the path to the CSV file and at least one variable to dump.");
+				LabLang.compilationError(
+						"Not enough arguments: please specify the path to the CSV file and at least one variable to dump.");
 			String pathNonAbsolute = args[0].getString();
 			String pathAbsolute = new File(LabLang.homeDirectory, pathNonAbsolute).getAbsolutePath();
 			Map<String, BigDecimal[]> mp = new HashMap<>();
@@ -214,7 +217,8 @@ public class Functions {
 					writer.add(resultingRow);
 				} catch (CSVMissingColumnValuesException e) {
 					e.printStackTrace();
-					LabLang.compilationError("CSVMissingColumnValuesException thrown, an internal error has occured, please investigate.");
+					LabLang.compilationError(
+							"CSVMissingColumnValuesException thrown, an internal error has occured, please investigate.");
 				} catch (CSVUnfinishedOrCorruptFileException e) {
 					e.printStackTrace();
 					LabLang.compilationError("CSV file corrupt, please recreate the CSV file manually.");
@@ -225,14 +229,15 @@ public class Functions {
 				LabLang.writeFile(new File(pathAbsolute), wt);
 			} catch (CSVUnfinishedOrCorruptFileException e) {
 				e.printStackTrace();
-				LabLang.compilationError("CSVUnfinishedOrCorruptFileException thrown, an internal error has occured, please investigate.");
+				LabLang.compilationError(
+						"CSVUnfinishedOrCorruptFileException thrown, an internal error has occured, please investigate.");
 			} catch (IOException e) {
 				e.printStackTrace();
 				LabLang.compilationError("I/O error.");
 			}
 			return null;
 		}
-		
+
 		@Override
 		public ExprVertex diff(ExprVertex v, String var) {
 			return null;
@@ -336,7 +341,8 @@ public class Functions {
 		@Override
 		public ExprVertex diff(ExprVertex v, String var) {
 			ExprVertex arg = (ExprVertex) v.getChildren()[0];
-			return createOperation('*', createConstant(BigDecimal.ONE.negate()), createOperation('*', createFunction("sin", arg.copy()), arg.dif(var)));
+			return createOperation('*', createConstant(BigDecimal.ONE.negate()),
+					createOperation('*', createFunction("sin", arg.copy()), arg.dif(var)));
 		}
 
 	};

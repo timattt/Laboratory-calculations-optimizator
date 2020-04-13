@@ -112,7 +112,7 @@ public class RoverCSV {
         try (FileReader ctntReader = new FileReader(fn)) {
             char[] arr = new char[maxCharactersForPlainCSV];
             ctntReader.read(arr);
-            ctnt = (new String(arr)).replaceAll("\r\n", "");
+            ctnt = (new String(arr)).replaceAll("\r\n", "\n");
         }
         String[] splitCtnt = ctnt.split("\n");
         if (splitCtnt.length < 2) 
