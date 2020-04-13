@@ -19,12 +19,7 @@ public class RoverCSV {
 	// the CSV file.
 	//
 	public class CSVMissingColumnValuesException extends Exception {
-	    /**
-		 * TODO write docs for this element
-		 */
-		private static final long serialVersionUID = -3639584737031827853L;
-
-		public CSVMissingColumnValuesException(String nm) {
+	    public CSVMissingColumnValuesException(String nm) {
 	        super(nm);
 	    }
 	}
@@ -34,12 +29,7 @@ public class RoverCSV {
 	// lization or when the file is corrupted.
 	//
 	public class CSVUnfinishedOrCorruptFileException extends Exception {
-	    /**
-		 * TODO write docs for this element
-		 */
-		private static final long serialVersionUID = -3324745637907547503L;
-
-		public CSVUnfinishedOrCorruptFileException() {
+	    public CSVUnfinishedOrCorruptFileException() {
 	        super();
 	    }
 	}
@@ -49,12 +39,7 @@ public class RoverCSV {
 	// ated with a specific CSV file.
 	//
 	public class CSVUnspecifiedTargetException extends Exception {
-	    /**
-		 * TODO write docs for this element
-		 */
-		private static final long serialVersionUID = 6961474877142084909L;
-
-		public CSVUnspecifiedTargetException() {
+	    public CSVUnspecifiedTargetException() {
 	        super();
 	     }
 	}
