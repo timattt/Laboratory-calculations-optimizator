@@ -66,6 +66,21 @@ public class Functions {
 		}
 
 	};
+	
+	static final Function arctg = new Function(1) {
+
+		@Override
+		public BigDecimal invoke(ExprVertex[] args) {
+			return DefaultBigDecimalMath.atan(args[0].process()[0]);
+		}
+
+		@Override
+		public ExprVertex diff(ExprVertex v, String var) {
+			ExprVertex arg = (ExprVertex) v.getChildren()[0];
+			return createOperation('*', createOperation('^', createFunction("cos", arg.copy()), createConstant(BigDecimal.ONE.add(BigDecimal.ONE).negate())), arg.dif(var));
+		}
+		
+	};
 
 	static final Function loadCsv = new Function(-1) {
 		@Override
