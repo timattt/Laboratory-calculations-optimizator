@@ -16,7 +16,7 @@ LCO - программа-калькулятор, которая позволяе
 Для запуска программы нужно в терминале перейти в директорию, где находится файл с программой и написать команду: java -jar LCO.jar 
 
 ## Пример
-![](https://github.com/timattt/Laboratory-calculations-optimizator/blob/master/Example.png)
+![](https://github.com/timattt/Laboratory-calculations-optimizator/blob/master/NiceExample.png)
 
 
 
