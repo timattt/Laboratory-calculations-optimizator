@@ -1,6 +1,6 @@
 # Laboratory calculation optimizator
 
-![](https://github.com/timattt/Laboratory-calculations-optimizator/blob/master/logo.png)
+![](https://github.com/timattt/Project-laboratory-calculations-optimizator/blob/master/logo.png)
 
 Программа для упрощения лабораторных расчетов. Больше информации в руководстве пользователя [тут](https://vk.com/doc206857173_536180513?hash=4bfe7327185c1a304b&dl=aaf596575affed5d77).
 
@@ -16,7 +16,7 @@ LCO - программа-калькулятор, которая позволяе
 Для запуска программы нужно в терминале перейти в директорию, где находится файл с программой и написать команду: java -jar LCO.jar 
 
 ## Пример
-![](https://github.com/timattt/Laboratory-calculations-optimizator/blob/master/NiceExample.png)
+![](https://github.com/timattt/Project-laboratory-calculations-optimizator/blob/master/NiceExample.png)
 
 
 
