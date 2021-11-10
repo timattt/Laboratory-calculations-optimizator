@@ -18,5 +18,9 @@ LCO - программа-калькулятор, которая позволяе
 ## Пример
 ![](https://github.com/timattt/Project-laboratory-calculations-optimizator/blob/master/NiceExample.png)
 
+## Инструкция пользователя
+
+Смотрите [тут](https://github.com/timattt/Project-laboratory-calculations-optimizator/blob/master/man6.pdf)
+
 
 
